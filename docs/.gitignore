@@ -1,0 +1,14 @@
+node_modules
+.nuxt
+.output
+.data
+dist
+
+# Env files — only .env.example is committed
+.env
+.env.*
+!.env.example
+
+# Wrangler — only the template is committed
+wrangler.jsonc
+.wrangler

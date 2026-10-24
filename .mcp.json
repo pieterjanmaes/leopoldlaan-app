@@ -1,0 +1,28 @@
+{
+	"mcpServers": {
+		"chrome-devtools": {
+			"command": "npx",
+			"args": ["-y", "chrome-devtools-mcp@latest"]
+		},
+		"nuxt": {
+			"command": "npx",
+			"args": ["mcp-remote", "https://nuxt.com/mcp"]
+		},
+		"nuxt-ui": {
+			"command": "npx",
+			"args": ["mcp-remote", "https://ui.nuxt.com/mcp"]
+		},
+		"nuxt-seo": {
+			"type": "http",
+			"url": "https://nuxtseo.com/mcp"
+		},
+		"figma-dev-mode-mcp-server": {
+			"type": "http",
+			"url": "http://127.0.0.1:3845/mcp"
+		},
+		"cloudflare": {
+			"command": "npx",
+			"args": ["mcp-remote", "https://docs.mcp.cloudflare.com/mcp"]
+		}
+	}
+}

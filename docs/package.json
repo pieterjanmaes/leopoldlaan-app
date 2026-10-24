@@ -1,0 +1,28 @@
+{
+	"name": "wotz-nuxt-starter-docs",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "nuxt dev --extends docus",
+		"build": "NITRO_PRESET=cloudflare_module nuxt build --extends docus",
+		"generate": "nuxt generate --extends docus",
+		"preview": "nuxt preview --extends docus",
+		"postinstall": "nuxt prepare --extends docus",
+		"deploy:preview": "wrangler deploy --config wrangler.jsonc --env preview",
+		"deploy:production": "wrangler deploy --config wrangler.jsonc",
+		"build:deploy:preview": "dotenv -e .env.preview -- pnpm run build && wrangler deploy --config wrangler.jsonc --env preview",
+		"build:deploy:production": "dotenv -e .env.production -- pnpm run build && wrangler deploy --config wrangler.jsonc"
+	},
+	"dependencies": {
+		"@nuxt/content": "^3.16.2",
+		"better-sqlite3": "^12.10.0",
+		"docus": "^5.15.0",
+		"nuxt": "^4.6.2",
+		"zod": "^4.4.3",
+		"zod-to-json-schema": "^3.25.2"
+	},
+	"devDependencies": {
+		"dotenv-cli": "^11.0.0",
+		"wrangler": "^4.92.0"
+	}
+}

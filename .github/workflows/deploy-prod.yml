@@ -1,0 +1,62 @@
+name: Cloudflare prod deploy
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [sanity-publish]
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Prepare Nuxt
+        run: npx nuxt prepare
+
+      - name: Test
+        run: npm test
+
+      - name: Build Nuxt
+        run: npm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          # Build environment
+          NUXT_SITE_ENV: production
+          NUXT_PRERENDER: 'true'
+          NUXT_SITE_URL: ${{ vars.NUXT_SITE_URL }}
+          NUXT_SESSION_PASSWORD: ${{ secrets.NUXT_SESSION_PASSWORD }}
+          NUXT_TURNSTILE_SECRET_KEY: ${{ secrets.NUXT_TURNSTILE_SECRET_KEY }}
+          SEED_KEY: ${{ secrets.SEED_KEY }}
+          GOOGLE_TAG_MANAGER_ID: ${{ vars.GOOGLE_TAG_MANAGER_ID }}
+          # Public vars
+          NUXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NUXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          NUXT_PUBLIC_USERBACK_TOKEN: ${{ vars.NUXT_PUBLIC_USERBACK_TOKEN }}
+
+      - name: Deploy to Cloudflare
+        run: npx wrangler deploy --config wrangler.jsonc
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}

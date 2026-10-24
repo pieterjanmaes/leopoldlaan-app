@@ -1,0 +1,52 @@
+{
+	"nuxtSiteConfig": {
+		"name": "WOTZ",
+		"description": "Who Owns The Zebra?"
+	},
+	"general": {
+		"goBack": "Ga terug",
+		"seeMore": "Meer laden"
+	},
+	"form": {
+		"firstName": "Voornaam",
+		"lastName": "Naam",
+		"email": "E-mailadres",
+		"phone": "Gsm-nummer",
+		"phoneCountry": "Landcode",
+		"phoneCountrySearch": "Zoek een land...",
+		"timeSlot": "Ik kom naar de jobdag om",
+		"timeSlotPlaceholder": "Selecteer een tijdstip",
+		"privacyPolicyLabel": "Voor meer informatie over hoe we omgaan met uw persoonlijke gegevens verwijzen we naar onze {link}.",
+		"privacyPolicyLink": "privacyverklaring",
+		"submit": "Verstuur",
+		"success": {
+			"title": "Inschrijving geslaagd!",
+			"description": "Je bent succesvol ingeschreven voor de jobdag."
+		},
+		"errors": {
+			"required": "Dit is een verplicht veld",
+			"invalidEmail": "Ongeldig e-mailadres",
+			"invalidPhone": "Ongeldig telefoonnummer",
+			"postalCode": "Maximaal 4 cijfers toegestaan",
+			"general": "Er ging iets mis",
+			"tryAgain": "Probeer het later opnieuw."
+		}
+	},
+	"cookiePolicy": {
+		"createdBy": "Deze cookieverklaring is opgesteld en bijgewerkt door"
+	},
+	"footer": {
+		"allRightsReserved": "Alle rechten voorbehouden.",
+		"navigation": {
+			"privacyPolicy": "Privacyverklaring",
+			"cookiePolicy": "Cookieverklaring",
+			"cookieChangeSettings": "Wijzig cookie-instellingen"
+		}
+	},
+	"error": {
+		"title": "Oeps, er ging iets mis. Geen zorgen, we zetten je op de juiste koers",
+		"goBack": "Teruggaan",
+		"form": "Er is een fout opgetreden, probeer het opnieuw",
+		"pageNotFound": "Deze pagina kon niet worden gevonden"
+	}
+}

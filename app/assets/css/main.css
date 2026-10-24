@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@import './prose.css';
+
+@source '../../../content/**/*';
+
+:root {
+	--color-violet-500: #802eaf;
+
+	--font-sans: 'Ubuntu';
+}
+
+.dark {
+}
+
+@layer base {
+}
+
+nuxt-studio {
+	position: relative;
+	z-index: 9999;
+}

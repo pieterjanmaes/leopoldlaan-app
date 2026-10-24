@@ -1,0 +1,19 @@
+{
+	"name": "wotz-nuxt-starter-presentation",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "slidev --open",
+		"build": "slidev build",
+		"export": "slidev export"
+	},
+	"dependencies": {
+		"@slidev/cli": "^0.50.0",
+		"@slidev/theme-default": "*",
+		"@slidev/theme-seriph": "*",
+		"vue": "^3.5.0"
+	},
+	"devDependencies": {
+		"@slidev/types": "^52.15.2"
+	}
+}

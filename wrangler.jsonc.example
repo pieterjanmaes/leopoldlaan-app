@@ -1,0 +1,66 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wotz-nuxt-starter",
+  "account_id": "YOUR_CF_ACCOUNT_ID",
+  "main": "./.output/server/index.mjs",
+  "compatibility_date": "2026-01-05",
+  "compatibility_flags": ["nodejs_compat"],
+  // "keep_vars": true,
+  "assets": {
+    "directory": "./.output/public/",
+    "binding": "ASSETS",
+    "html_handling": "drop-trailing-slash"
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true
+    }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_id": "YOUR_PRODUCTION_DATABASE_ID"
+    }
+  ],
+  "vars": {
+    "NUXT_SITE_ENV": "production",
+    "NUXT_SITE_URL": "https://your-production-domain.com",
+    "NUXT_PUBLIC_TURNSTILE_SITE_KEY": "YOUR_TURNSTILE_SITE_KEY"
+  },
+  // Secrets (sensitive data - use `wrangler secret put <NAME>`)
+  // Run these commands to add secrets to production:
+  //
+  // wrangler secret put NUXT_TURNSTILE_SECRET_KEY
+  // wrangler secret put NUXT_SESSION_PASSWORD
+  //
+  //
+  // For preview environment, add secrets with --env preview:
+  // wrangler secret put NUXT_TURNSTILE_SECRET_KEY --env preview
+  // wrangler secret put NUXT_SESSION_PASSWORD
+  //
+  // Environment-specific configurations
+  "env": {
+    "preview": {
+      "name": "wotz-nuxt-starter-preview",
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_id": "YOUR_PREVIEW_DATABASE_ID"
+        }
+      ],
+      "vars": {
+        "NUXT_SITE_ENV": "staging",
+        "NUXT_SITE_URL": "https://your-preview-domain.workers.dev",
+        "NUXT_PUBLIC_TURNSTILE_SITE_KEY": "YOUR_TURNSTILE_SITE_KEY"
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "wotz-nuxt-starter-docs",
+	"account_id": "YOUR_CF_ACCOUNT_ID",
+	"main": "./.output/server/index.mjs",
+	"compatibility_date": "2026-04-02",
+	"compatibility_flags": ["nodejs_compat"],
+
+	"assets": {
+		"directory": "./.output/public/",
+		"binding": "ASSETS",
+		"html_handling": "drop-trailing-slash"
+	},
+
+	"observability": {
+		"logs": {
+			"enabled": true,
+			"head_sampling_rate": 1
+		}
+	},
+
+	"vars": {
+		"NUXT_SITE_ENV": "production",
+		"NUXT_SITE_URL": "https://docs-wotz-nuxt-starter.workers.dev"
+	},
+
+	"env": {
+		"preview": {
+			"name": "wotz-nuxt-starter-docs-preview",
+			"vars": {
+				"NUXT_SITE_ENV": "staging",
+				"NUXT_SITE_URL": "https://wotz-nuxt-starter-docs-preview.workers.dev"
+			}
+		}
+	}
+}

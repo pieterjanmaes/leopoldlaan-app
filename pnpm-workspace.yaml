@@ -1,0 +1,24 @@
+# Native/build-time deps allowed to run install scripts.
+# pnpm 11.15 replaced the old package.json "pnpm.onlyBuiltDependencies" list
+# with this allowBuilds map (true = allowed to run postinstall build scripts).
+allowBuilds:
+  '@parcel/watcher': true
+  better-sqlite3: true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+  vue-demi: true
+  workerd: true
+
+# Supply-chain policy: pnpm 11.15+ blocks packages published within the
+# minimumReleaseAge cutoff. Nuxt cuts releases we adopt immediately, so
+# exclude the Nuxt packages from the age check while keeping protection
+# for everything else.
+minimumReleaseAgeExclude:
+  - nuxt
+  - '@nuxt/*'
+
+# pnpm 11 no longer reads `shamefully-hoist=true` from .npmrc; without this the
+# root node_modules holds only direct deps, so tsconfig's `"types": ["node"]`
+# can't resolve @types/node and `pnpm run lint` fails at the tsconfig check.
+shamefullyHoist: true

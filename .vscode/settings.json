@@ -1,0 +1,10 @@
+{
+	"[json]": {
+		"editor.formatOnSave": false,
+		"editor.defaultFormatter": null
+	},
+	"[jsonc]": {
+		"editor.formatOnSave": false,
+		"editor.defaultFormatter": null
+	}
+}

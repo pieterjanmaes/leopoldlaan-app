@@ -1,0 +1,22 @@
+/* Verberg alle on-hover nav controls (prev/next/overzicht/fullscreen) */
+#page-root > .grid > div > div.absolute.bottom-0 {
+	display: none !important;
+}
+
+/* Verberg de floating drawing toolbar aan de rand */
+[aria-labelledby^="floating-ui-"],
+.v-popper__popper {
+	display: none !important;
+}
+
+/* Workaround for slidevjs/slidev#2522: the goto dialog's autocomplete
+   list overflows the viewport when there are many slides, so the slide
+   list is visible even though the dialog is "hidden" via -top-20.
+   Force display:none only in the hidden state — pressing `g` adds top-5
+   instead, so this rule won't match and the dialog opens normally. */
+#slidev-goto-dialog[class*="-top-20"] {
+	display: none !important;
+}
+
+/* Houd presenter notes wel zichtbaar in presenter mode —
+   bovenstaande selectors raken enkel de play view controls */
