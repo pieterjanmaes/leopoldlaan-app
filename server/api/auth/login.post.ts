@@ -1,55 +1,14 @@
-import { eq } from 'drizzle-orm';
-import { db } from 'hub:db';
-import { z } from 'zod';
-
-import { tables } from '../../utils/drizzle';
-
-const schema = z.object({
-	email: z.email(),
-	password: z.string().min(8),
-	captchaToken: z.string().min(1)
-});
+import { loginSchema } from '../../../shared/schemas/auth';
 
 export default defineEventHandler(async (event) => {
-	const body = await readValidatedBody(event, (body) => schema.parse(body));
+	const body = await readValidatedBody(event, (body) => loginSchema.parse(body));
 
-	// Verify Turnstile captcha token
-	const isValidCaptcha = await verifyTurnstileToken(body.captchaToken);
-	if (!isValidCaptcha) {
-		throw createError({
-			statusCode: 400,
-			message: 'Invalid captcha verification'
-		});
+	if (!(await verifyTurnstileToken(body.captchaToken))) {
+		throw createError({ statusCode: 400, message: 'Captcha-verificatie mislukt, probeer opnieuw' });
 	}
 
-	const user = await db.select().from(tables.users).where(eq(tables.users.email, body.email)).get();
+	const user = await findUserByCredentials(body.email, body.password);
+	await startUserSession(event, user);
 
-	if (!user) {
-		throw createError({
-			statusCode: 401,
-			message: 'Invalid email or password'
-		});
-	}
-
-	const isValidPassword = await verifyPassword(user.password, body.password);
-
-	if (!isValidPassword) {
-		throw createError({
-			statusCode: 401,
-			message: 'Invalid email or password'
-		});
-	}
-
-	await setUserSession(event, {
-		user: {
-			id: user.id,
-			email: user.email,
-			name: user.name,
-			role: user.role as 'admin' | 'superadmin'
-		}
-	});
-
-	return {
-		success: true
-	};
+	return user;
 });

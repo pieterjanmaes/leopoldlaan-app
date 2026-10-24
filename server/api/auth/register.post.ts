@@ -1,58 +1,44 @@
-import { eq } from 'drizzle-orm';
+import { createId } from '@paralleldrive/cuid2';
 import { db } from 'hub:db';
-import { z } from 'zod';
 
-import { tables } from '../../utils/drizzle';
-
-const schema = z.object({
-	email: z.email(),
-	password: z.string().min(8),
-	name: z.string().optional(),
-	role: z.enum(['admin', 'superadmin']).default('admin')
-});
+import { registerSchema } from '../../../shared/schemas/auth';
+import { eq, tables } from '../../utils/drizzle';
 
 export default defineEventHandler(async (event) => {
-	// Only superadmin can create users
-	const session = await requireUserSession(event);
-	if (session.user.role !== 'superadmin') {
-		throw createError({
-			statusCode: 403,
-			message: 'Only superadmin can create users'
-		});
+	const body = await readValidatedBody(event, (body) => registerSchema.parse(body));
+	const invite = await findValidInvite(body.invite);
+
+	const existing = await db.select().from(tables.users).where(eq(tables.users.email, invite.email)).get();
+	if (existing) {
+		throw createError({ statusCode: 400, message: 'Er bestaat al een account met dit e-mailadres' });
 	}
 
-	const body = await readValidatedBody(event, (body) => schema.parse(body));
+	const userId = createId();
+	await db.insert(tables.users).values({
+		id: userId,
+		email: invite.email,
+		name: body.name,
+		password: await hashPassword(body.password),
+		role: invite.role,
+		contactId: invite.contactId
+	});
+	await consumeInvite(invite.id, userId);
 
-	// Check if user already exists
-	const existingUser = await db.select().from(tables.users).where(eq(tables.users.email, body.email)).get();
-
-	if (existingUser) {
-		throw createError({
-			statusCode: 400,
-			message: 'User already exists'
-		});
+	// Two tabs racing on one link: only the one that marked the invite keeps its account.
+	const claimed = await db.select().from(tables.invites).where(eq(tables.invites.id, invite.id)).get();
+	if (claimed?.usedBy !== userId) {
+		await db.delete(tables.users).where(eq(tables.users.id, userId));
+		throw createError({ statusCode: 410, message: 'Deze uitnodiging is ongeldig of al gebruikt' });
 	}
 
-	const hashedPassword = await hashPassword(body.password);
+	const user = toSessionUser({
+		id: userId,
+		email: invite.email,
+		name: body.name,
+		role: invite.role,
+		contactId: invite.contactId
+	});
+	await startUserSession(event, user);
 
-	const user = await db
-		.insert(tables.users)
-		.values({
-			email: body.email,
-			password: hashedPassword,
-			name: body.name,
-			role: body.role
-		})
-		.returning()
-		.get();
-
-	return {
-		success: true,
-		user: {
-			id: user.id,
-			email: user.email,
-			name: user.name,
-			role: user.role
-		}
-	};
+	return user;
 });
