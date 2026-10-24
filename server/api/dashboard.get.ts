@@ -69,6 +69,9 @@ export default defineEventHandler(async (event): Promise<DashboardView> => {
 			.filter((task) => isBlocked(task, statusById) && (!task.startDate || task.startDate <= soon))
 			.slice(0, LIST_LIMIT),
 		budget,
-		recentFiles
+		recentFiles,
+		openDecisions: internal
+			? (await listDecisions()).filter((decision) => decision.status === 'open').slice(0, LIST_LIMIT)
+			: []
 	};
 });

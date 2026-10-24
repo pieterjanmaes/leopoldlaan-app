@@ -47,9 +47,9 @@
 		<nav
 			aria-label="Ga naar"
 			class="bg-default/95 border-default fixed inset-x-0 bottom-0 z-40 grid border-t pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
-			:style="{ gridTemplateColumns: `repeat(${primaryLinks.length}, minmax(0, 1fr))` }">
+			:style="{ gridTemplateColumns: `repeat(${mobileLinks.length}, minmax(0, 1fr))` }">
 			<NuxtLink
-				v-for="link in primaryLinks"
+				v-for="link in mobileLinks"
 				:key="String(link.to)"
 				:to="link.to"
 				class="text-muted flex flex-col items-center gap-0.5 py-2 text-xs"
@@ -94,6 +94,9 @@
 	const visible = (entries: NavEntry[]) => entries.filter((entry) => internal.value || entry.external);
 	const primaryLinks = computed<Link[]>(() => visible(PRIMARY_NAV).map(toLink));
 	const secondaryLinks = computed<Link[]>(() => visible(SECONDARY_NAV).map(toLink));
+	const mobileLinks = computed<Link[]>(() => visible(PRIMARY_NAV.filter((entry) => entry.mobile)).map(toLink));
+
+	const { decisions } = useDecisions({ immediate: internal.value });
 
 	const searchGroups = computed(() => [
 		{ id: 'links', label: 'Ga naar', items: [...primaryLinks.value, ...secondaryLinks.value] },
@@ -105,6 +108,16 @@
 				icon: TASK_STATUS_META[task.status].icon,
 				suffix: TASK_STATUS_META[task.status].label,
 				to: { path: '/taken', query: { taak: task.id } }
+			}))
+		},
+		{
+			id: 'decisions',
+			label: 'Beslissingen',
+			items: decisions.value.map((decision) => ({
+				label: decision.title,
+				icon: DECISION_STATUS_META[decision.status].icon,
+				suffix: decision.reference ?? DECISION_STATUS_META[decision.status].label,
+				to: { path: '/beslissingen', query: { beslissing: decision.id } }
 			}))
 		}
 	]);

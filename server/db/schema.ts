@@ -4,6 +4,7 @@ import { index, integer, primaryKey, real, sqliteTable, text, uniqueIndex } from
 import {
 	ATTACHMENT_ENTITIES,
 	CATEGORY_COLORS,
+	DECISION_STATUSES,
 	PAYMENT_METHODS,
 	PLAN_MARKER_KINDS,
 	QUOTE_STATUSES,
@@ -293,4 +294,33 @@ export const planMarkers = sqliteTable(
 		updatedAt: updatedAt()
 	},
 	(table) => [index('plan_markers_floor_idx').on(table.floorPlanId)]
+);
+
+/**
+ * A choice made (or still to make) during the works: "Tiles: model X, 60×60, ordered 12 Nov". Kept so the
+ * reasoning survives, and so things can be re-ordered later.
+ */
+export const decisions = sqliteTable(
+	'decisions',
+	{
+		id: id(),
+		title: text('title').notNull(),
+		/** What was chosen, the options considered and why. */
+		body: text('body'),
+		status: text('status', { enum: DECISION_STATUSES }).notNull().default('open'),
+		/** Open decisions: decide before this date. */
+		deadline: text('deadline'),
+		decidedOn: text('decided_on'),
+		decidedBy: text('decided_by').references(() => users.id, { onDelete: 'set null' }),
+		roomId: text('room_id').references(() => rooms.id, { onDelete: 'set null' }),
+		categoryId: text('category_id').references(() => categories.id, { onDelete: 'set null' }),
+		taskId: text('task_id').references(() => tasks.id, { onDelete: 'set null' }),
+		contactId: text('contact_id').references(() => contacts.id, { onDelete: 'set null' }),
+		/** Product, model, colour code… whatever is needed to order it again. */
+		reference: text('reference'),
+		createdBy: text('created_by').references(() => users.id, { onDelete: 'set null' }),
+		createdAt: createdAt(),
+		updatedAt: updatedAt()
+	},
+	(table) => [index('decisions_status_idx').on(table.status), index('decisions_room_idx').on(table.roomId)]
 );

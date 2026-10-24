@@ -2,6 +2,7 @@ import type { CategoryBudget, BudgetTotals } from '../utils/budget';
 import type {
 	AttachmentEntity,
 	CategoryColor,
+	DecisionStatus,
 	PaymentMethod,
 	PlanMarkerKind,
 	QuoteStatus,
@@ -185,6 +186,8 @@ export interface DashboardView {
 	/** Null for externals, who don't see the budget. */
 	budget: { totals: BudgetTotals; categories: CategoryBudget[]; unpaidCount: number; unpaidCents: number } | null;
 	recentFiles: AttachmentView[];
+	/** Open decisions, soonest deadline first; empty for externals. */
+	openDecisions: DecisionView[];
 }
 
 export interface DriveStatus {
@@ -262,4 +265,21 @@ export interface FloorPlanView {
 	aspectRatio: number;
 	sortOrder: number;
 	markers: PlanMarkerView[];
+}
+
+export interface DecisionView {
+	id: string;
+	title: string;
+	body: string | null;
+	status: DecisionStatus;
+	deadline: string | null;
+	decidedOn: string | null;
+	decidedBy: PersonRef | null;
+	roomId: string | null;
+	categoryId: string | null;
+	taskId: string | null;
+	contactId: string | null;
+	reference: string | null;
+	attachmentCount: number;
+	updatedAt: string;
 }

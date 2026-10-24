@@ -58,6 +58,34 @@ const MILESTONES = [
 	{ name: 'Verhuis', week: 27 }
 ];
 
+const OPEN_DECISIONS = [
+	{
+		title: 'Verwarming: warmtepomp, gas of hybride',
+		body: 'Bepaalt de leidingen, de vloerverwarming en de elektrische aansluiting. Vergelijk ook de premies.',
+		category: 'Verwarming & ventilatie',
+		week: 8
+	},
+	{
+		title: 'Ventilatie: systeem C of D',
+		body: 'Kanalen moeten vóór het pleisterwerk liggen. Systeem D is duurder maar zuiniger bij een goed geïsoleerd huis.',
+		category: 'Verwarming & ventilatie',
+		week: 10
+	},
+	{
+		title: 'Stopcontacten en lichtpunten per ruimte',
+		body: 'Duid ze aan op het grondplan voor de elektricien begint.',
+		category: 'Elektriciteit',
+		week: 11
+	},
+	{
+		title: 'Vloerbekleding gelijkvloers',
+		body: 'Tegels, parket of gietvloer? Bepaalt de dikte van de chape.',
+		category: 'Chape & vloeren',
+		week: 14
+	},
+	{ title: 'Keuken: leverancier en opstelling', body: null, category: 'Keuken', week: 16 }
+] as const;
+
 function isEmpty(table: typeof tables.categories | typeof tables.rooms | typeof tables.phases) {
 	return db
 		.select({ count: sql<number>`count(*)` })
@@ -169,6 +197,17 @@ async function seedStructure(ownerId: string): Promise<boolean> {
 			notes: 'Enkel bij vernieuwen van de volledige installatie, met keuringsverslag'
 		}
 	]);
+
+	// Choices that usually block the order of works, with a deadline before the phase that needs them.
+	await db.insert(tables.decisions).values(
+		OPEN_DECISIONS.map((decision) => ({
+			title: decision.title,
+			body: decision.body,
+			categoryId: categoryId(decision.category),
+			deadline: week(decision.week),
+			createdBy: ownerId
+		}))
+	);
 
 	return true;
 }

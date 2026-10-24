@@ -76,6 +76,34 @@
 		</UFormField>
 
 		<div
+			v-if="roomDecisions.length"
+			class="space-y-1">
+			<p class="text-muted text-xs font-semibold tracking-wide uppercase">Beslissingen in deze ruimte</p>
+			<ul class="space-y-1">
+				<li
+					v-for="decision in roomDecisions"
+					:key="decision.id">
+					<NuxtLink
+						:to="{ path: '/beslissingen', query: { beslissing: decision.id } }"
+						class="hover:bg-elevated/50 -mx-2 flex items-start gap-2 rounded-md px-2 py-1 text-sm">
+						<UIcon
+							:name="DECISION_STATUS_META[decision.status].icon"
+							class="mt-0.5 size-4 shrink-0"
+							:class="decision.status === 'open' ? 'text-warning' : 'text-success'" />
+						<span class="min-w-0">
+							<span class="text-highlighted block truncate">{{ decision.title }}</span>
+							<span
+								v-if="decision.reference"
+								class="text-muted block truncate text-xs">
+								{{ decision.reference }}
+							</span>
+						</span>
+					</NuxtLink>
+				</li>
+			</ul>
+		</div>
+
+		<div
 			v-if="roomTasks.length"
 			class="space-y-1">
 			<p class="text-muted text-xs font-semibold tracking-wide uppercase">Open taken in deze ruimte</p>
@@ -113,6 +141,7 @@
 
 	const { roomOptions } = useLookups();
 	const { tasks } = useTasks();
+	const { decisions } = useDecisions();
 
 	function fromMarker(marker: PlanMarkerView) {
 		return {
@@ -132,6 +161,11 @@
 	const note = useNullableText(state, 'note');
 
 	const taskOptions = computed(() => tasks.value.map((task) => ({ label: task.title, value: task.id })));
+	const roomDecisions = computed(() =>
+		state.roomId
+			? decisions.value.filter((decision) => decision.roomId === state.roomId && decision.status !== 'replaced')
+			: []
+	);
 	const roomTasks = computed(() =>
 		state.roomId ? tasks.value.filter((task) => task.roomId === state.roomId && task.status !== 'done') : []
 	);

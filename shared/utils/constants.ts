@@ -62,11 +62,21 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
 	other: 'Andere'
 };
 
+/** Open: still to choose. Decided: settled. Replaced: overruled by a later decision, kept for the history. */
+export const DECISION_STATUSES = ['open', 'decided', 'replaced'] as const;
+export type DecisionStatus = (typeof DECISION_STATUSES)[number];
+
+export const DECISION_STATUS_META: Record<DecisionStatus, { label: string; icon: string; color: BadgeColor }> = {
+	open: { label: 'Te beslissen', icon: 'i-lucide-circle-help', color: 'warning' },
+	decided: { label: 'Beslist', icon: 'i-lucide-circle-check-big', color: 'success' },
+	replaced: { label: 'Vervangen', icon: 'i-lucide-history', color: 'neutral' }
+};
+
 export const PLAN_MARKER_KINDS = ['zone', 'pin'] as const;
 export type PlanMarkerKind = (typeof PLAN_MARKER_KINDS)[number];
 
 /** Things a Drive file can be attached to. */
-export const ATTACHMENT_ENTITIES = ['task', 'quote', 'expense', 'room', 'contact', 'subsidy'] as const;
+export const ATTACHMENT_ENTITIES = ['task', 'quote', 'expense', 'room', 'contact', 'subsidy', 'decision'] as const;
 export type AttachmentEntity = (typeof ATTACHMENT_ENTITIES)[number];
 
 export const CATEGORY_COLORS = [

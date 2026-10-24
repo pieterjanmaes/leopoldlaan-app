@@ -107,6 +107,51 @@
 					<CCategoryBudgetBars :categories="dashboard.budget.categories" />
 				</UCard>
 
+				<UCard v-if="internal">
+					<template #header>
+						<CSectionHeading
+							size="sm"
+							title="Nog te beslissen">
+							<template #actions>
+								<UButton
+									to="/beslissingen"
+									label="Alle"
+									trailingIcon="i-lucide-arrow-right"
+									color="neutral"
+									variant="link"
+									size="sm" />
+							</template>
+						</CSectionHeading>
+					</template>
+					<ul
+						v-if="dashboard.openDecisions.length"
+						class="divide-default divide-y">
+						<li
+							v-for="decision in dashboard.openDecisions"
+							:key="decision.id">
+							<NuxtLink
+								:to="{ path: '/beslissingen', query: { beslissing: decision.id } }"
+								class="hover:bg-elevated/50 -mx-2 flex items-center gap-3 rounded-md px-2 py-2">
+								<UIcon
+									name="i-lucide-circle-help"
+									class="text-warning size-4 shrink-0" />
+								<span class="text-highlighted min-w-0 flex-1 truncate text-sm font-medium">{{ decision.title }}</span>
+								<span
+									v-if="decision.deadline"
+									class="shrink-0 text-xs"
+									:class="decision.deadline < today ? 'text-error font-medium' : 'text-muted'">
+									{{ dueLabel(decision.deadline, today) }}
+								</span>
+							</NuxtLink>
+						</li>
+					</ul>
+					<p
+						v-else
+						class="text-muted text-sm">
+						Alles is beslist.
+					</p>
+				</UCard>
+
 				<UCard>
 					<template #header>
 						<CSectionHeading
@@ -149,6 +194,7 @@
 <script setup lang="ts">
 	const { user } = useUserSession();
 	const internal = computed(() => isInternal(user.value));
+	const today = todayIso();
 
 	const { data: dashboard } = await useFetch<DashboardView>('/api/dashboard', { key: 'dashboard' });
 
