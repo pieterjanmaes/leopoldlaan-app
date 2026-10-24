@@ -5,26 +5,12 @@ export default defineAppConfig({
 	},
 	ui: {
 		colors: {
-			primary: 'violet'
+			primary: 'amber',
+			neutral: 'stone'
 		},
 		input: {
 			slots: {
 				root: 'relative flex items-center'
-			}
-		},
-		prose: {
-			h1: {
-				slots: {
-					base: 'text-primary'
-				}
-			},
-			h2: {
-				slots: {
-					base: 'text-primary'
-				}
-			},
-			p: {
-				base: ''
 			}
 		}
 	}

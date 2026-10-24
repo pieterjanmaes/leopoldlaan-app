@@ -1,44 +1,17 @@
 import { db } from 'hub:db';
-import { z } from 'zod';
 
-import { tables, eq } from '../../utils/drizzle';
-
-const paramsSchema = z.object({
-	id: z.string()
-});
+import { idParams } from '../../../shared/schemas/common';
+import { eq, tables } from '../../utils/drizzle';
 
 export default defineEventHandler(async (event) => {
-	// Only superadmin can delete users
-	const session = await requireUserSession(event);
-	if (session.user.role !== 'superadmin') {
-		throw createError({
-			statusCode: 403,
-			message: 'Only superadmin can delete users'
-		});
+	const owner = await requireOwner(event);
+	const { id } = await getValidatedRouterParams(event, (params) => idParams.parse(params));
+
+	if (id === owner.id) {
+		throw createError({ statusCode: 400, message: 'Je kan jezelf niet verwijderen' });
 	}
 
-	const params = await getValidatedRouterParams(event, (params) => paramsSchema.parse(params));
+	await db.delete(tables.users).where(eq(tables.users.id, id));
 
-	// Prevent deleting yourself
-	if (params.id === session.user.id) {
-		throw createError({
-			statusCode: 400,
-			message: 'Cannot delete your own account'
-		});
-	}
-
-	const user = await db.select().from(tables.users).where(eq(tables.users.id, params.id)).get();
-
-	if (!user) {
-		throw createError({
-			statusCode: 404,
-			message: 'User not found'
-		});
-	}
-
-	await db.delete(tables.users).where(eq(tables.users.id, params.id));
-
-	return {
-		success: true
-	};
+	return { success: true };
 });

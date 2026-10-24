@@ -2,8 +2,13 @@ declare module '#auth-utils' {
 	interface User {
 		id: string;
 		email: string;
-		name: string | null;
-		role: 'admin' | 'superadmin';
+		name: string;
+		role: 'owner' | 'member' | 'external';
+		contactId: string | null;
+	}
+
+	interface UserSession {
+		loggedInAt?: number;
 	}
 }
 

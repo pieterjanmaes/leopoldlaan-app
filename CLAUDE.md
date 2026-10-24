@@ -2,17 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Developer docs site:** Full human-readable documentation lives in `docs/` — a Docus-based Nuxt site organized by topic (getting-started, content, i18n, database, auth, security, deployment, troubleshooting). Source markdown is at `docs/content/**`. When updating CLAUDE.md or README.md, also consider whether the change belongs in `docs/content/`.
+**Developer docs site:** Full human-readable documentation lives in `docs/` — a Docus-based Nuxt site organized by topic (getting-started, features, users-and-roles, google-drive, development, database, security, deployment, troubleshooting, roadmap — the last one holds the feature ideas, technical checklist and Flemish renovation tips). Source markdown is at `docs/content/**`. When updating CLAUDE.md or README.md, also consider whether the change belongs in `docs/content/`.
 
 **Live-talk presentation:** A Slidev deck about the project lives in `presentation/slides.md` (~30 slides, tech-talk format). When the project architecture changes meaningfully, consider whether the slides need updating too — speaker notes reference specific code paths and gotchas.
 
 ## Project Overview
 
-This is a Nuxt 4 starter project by Who Owns The Zebra (WOTZ) configured with:
-- **Nuxt UI v4** as component library with Tailwind CSS v4
-- **i18n** for multilingual support (Dutch/French for Belgium)
-- **Nuxt Content v3** for markdown-based content management
-- **Nuxt Studio** for visual content editing
+**Leopoldlaan** is a private renovation-management app (tasks, Gantt planning, budget, Google Drive files) for a household plus contractors. See `README.md` for features, roles and the Google Drive setup. It was started from the WOTZ Nuxt starter and is configured with:
+- **Nuxt UI v4** as component library with Tailwind CSS v4 (dashboard components throughout)
+- **i18n** with Dutch only (`strategy: 'no_prefix'`); UI strings are written in Dutch directly in components
 - **NuxtHub** for deployment infrastructure with D1 database
 - **SEO modules** for search optimization
 - **Authentication** with nuxt-auth-utils
@@ -101,150 +99,54 @@ The project uses **`dotenv -e`** to load environment-specific variables:
 This project uses **Nuxt 4 directory structure** where `app/` is the source folder:
 - `app/components/` - Vue components (auto-imported, prefix with `C` for custom)
 - `app/pages/` - File-based routing
-- `app/pages/[...slug].vue` - Catch-all renders content collection pages
-- `app/layouts/` - Layout templates (`default`, `dashboard`, `login`)
+- `app/layouts/` - Layout templates (`default` = dashboard shell, `auth`)
 - `app/plugins/` - Nuxt plugins
 - `app/composables/` - Auto-imported composables (incl. `useTranslatedPath`)
-- `app/middleware/` - Route middleware (`auth`, `superadmin`)
+- `app/middleware/` - Route middleware (`auth.global`, `internal`)
 - `app/assets/` - Static assets (CSS, SVG)
-- `content/{locale}/` - Markdown content per locale (`nl/`, `fr/`)
-- `i18n/locales/` - Translation JSON files (`nl.json`, `fr.json`)
+- `i18n/locales/nl.json` - Site name/description only
+- `shared/` - Code used by app and server: `utils/` (constants, money, VAT, dates, budget, dependencies, permissions), `schemas/` (Zod), `types/` (API shapes)
 - `server/api/` - API endpoints
 - `server/db/` - Drizzle schema + migrations (sqlite/)
 
 ## Internationalization
 
-- **Default locale:** `nl` (nl-BE)
-- **Supported locales:** `nl`, `fr` (fr-BE)
-- **Strategy:** `prefix` — every URL is locale-prefixed (`/nl/...`, `/fr/...`)
-- **Root redirect:** `/` → `/nl` via `i18n.rootRedirect` (302)
-- **Browser detection:** Disabled (explicit locale via switcher)
+Dutch only: `@nuxtjs/i18n` stays for formatting/locale plumbing with one `nl` locale and `strategy: 'no_prefix'`, so URLs have no locale prefix. Nuxt Content and Nuxt Studio were removed (the app has no public content pages). UI strings live in the components in Dutch; Zod messages are Dutch via `useZodLocale()`.
 
-### Content + i18n integration pattern
-
-This setup uses **one Nuxt Content collection per locale**, with content paths that DO NOT contain the locale prefix. The locale prefix is added at the URL routing level by `@nuxtjs/i18n`.
-
-**`content.config.ts`:**
-```ts
-content_nl: defineCollection({
-  type: 'page',
-  source: { include: 'nl/**/*.md', prefix: '/' },  // prefix MUST be '/'
-  schema: pageSchema
-}),
-content_fr: defineCollection({
-  type: 'page',
-  source: { include: 'fr/**/*.md', prefix: '/' },
-  schema: pageSchema
-})
-```
-
-A file at `content/nl/cookie-policy.md` is stored with path `/cookie-policy` (NOT `/nl/cookie-policy`).
-
-**`app/pages/[...slug].vue`** queries the locale-specific collection:
-```ts
-const collection = ('content_' + locale.value) as keyof Collections;
-const content = await queryCollection(collection).path(slug.value).first();
-```
-
-**DO NOT** prepend the locale to the query path. The collection scope already encodes the locale.
-
-### Translation linking via `canonicalId`
-
-Every content file must declare a `canonicalId` in frontmatter. Files in different locales that share a canonicalId are treated as translations of one another:
-
-```md
----
-canonicalId: cookie-policy
-title: Cookieverklaring
----
-```
-
-`app/composables/useTranslatedPath.ts` queries by canonicalId to resolve the equivalent URL in each locale. `CLanguageSwitcher` uses these resolved paths via the shared `translatedPaths` state set in `[...slug].vue`.
-
-This means filenames can diverge across locales (e.g. `cookie-policy.md` in NL vs `politique-cookies.md` in FR) — the switcher still navigates correctly because it follows canonicalId, not the slug.
+App routes: `/` (overview), `/taken`, `/aankopen`, `/beslissingen`, `/planning`, `/grondplan`, `/budget`, `/bestanden`, `/contacten`, `/instellingen`, `/account`, `/login`, `/registreer`. `app/middleware/auth.global.ts` sends anonymous visitors to `/login`; `internal` middleware keeps externals out of household-only pages.
 
 ## Database Schema
 
-Located in `server/db/schema.ts`:
+Located in `server/db/schema.ts`. Conventions: CUID2 text ids, money as integer **cents**, calendar dates as `'YYYY-MM-DD'` text (no timezone shifts), moments as integer timestamps, enums from `shared/utils/constants.ts`. Inferred row types are exported from `server/utils/drizzle.ts`; API response shapes are in `shared/types/api.ts`; input schemas (Zod, shared by forms and endpoints) in `shared/schemas/`.
 
-### Users Table
-- `id` (text, CUID2) - Primary key
-- `email` (text, unique) - User email
-- `password` (text) - scrypt-hashed password
-- `name` (text) - Display name
-- `role` (text) - `admin` or `superadmin`
-- `createdAt` (integer timestamp)
+Tables: `users` (role `owner | member | external`, optional `contactId`), `project` (single row `id='main'`), `rooms`, `categories` (werkposten, with colour + icon), `phases` (incl. milestones), `contacts`, `tasks`, `task_dependencies`, `task_comments`, `budget_lines`, `quotes`, `expenses`, `subsidies`, `drive_connection` (single row, encrypted refresh token), `attachments` (Drive file ↔ entity), `invites` (hashed token), `materials` (shopping list; unpriced or invoiced items don't count as expected cost, `POST /api/materials/invoice` books selected items as one expense), `decisions` (open/decided/replaced, `decisionStamps()` sets decided on/by), `floor_plans` + `plan_markers` (zones/pins; `points` is JSON of `[x, y]` fractions 0..1 of the plan).
 
-### Form Submissions Table
-- `id` (text, CUID2) - Primary key
-- `firstName`, `lastName`, `email`, `phone`, `timeSlot` (text)
-- `createdAt` (integer timestamp)
+Floor plans render with `vue-konva` (registered in `app/plugins/vueKonva.client.ts`, so `CFloorPlanCanvas` must stay inside `<ClientOnly>`). Canvas colours come from `app/utils/colors.ts` because Konva needs real colour values, not Tailwind classes.
 
 ## Authentication
 
-Using `nuxt-auth-utils`:
-- Session-based authentication, scrypt password hashing
-- User roles: `admin`, `superadmin`
+Using `nuxt-auth-utils` with sessions re-validated against the DB (`server/utils/auth.ts`, `server/plugins/session.ts`): deleted users and sessions older than a password change are logged out.
 
-### Middleware
-- `auth.ts` - Requires authenticated user
-- `superadmin.ts` - Requires superadmin role
+Roles: `owner` (everything), `member` (everything except users/invites/Drive connection), `external` (only tasks assigned to their contact or themselves; can change status, comment, upload). Server guards: `requireUser`, `requireInternal`, `requireOwner`; task visibility via `taskVisibility()` in `server/utils/tasks.ts`; file access via `assertCanAccessFile()` in `server/utils/attachments.ts`. Client helpers `isInternal` / `isOwner` live in `shared/utils/permissions.ts`.
 
-### API Endpoints
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
-- `POST /api/auth/register` - Create user (superadmin only)
-- `GET /api/users` - List users (superadmin only)
-- `PATCH /api/users/[id]` - Update user (superadmin only)
-- `DELETE /api/users/[id]` - Delete user (superadmin only)
-- `POST /api/users/[id]/reset-password` - Reset password (superadmin only)
-- `GET /api/form/submissions` - List form submissions
-- `POST /api/form/submit` - Submit form
-- `POST /api/seed` - Seed database (dev only)
+New users join through invites (`/api/invites`, `/registreer?invite=…`).
+
+API overview (`server/api/`): `auth/{login,logout,register}`, `lookups` (rooms/categories/phases/contacts/users in one call), `project`, `tasks` (+ `move` for kanban, `[id]/comments`), `rooms|categories|phases|contacts|budget-lines|subsidies|quotes|expenses` CRUD, `budget` (overview + forecast), `dashboard`, `users`, `invites`, `me/password`, `drive/*` (status, files, folders, upload, content/thumbnail proxy, root, connection), `attachments`, `seed` (dev or `x-seed-key`). OAuth route: `server/routes/auth/google-drive.get.ts`.
 
 Server-side database access uses the `hub:db` virtual module:
 ```ts
 import { db } from 'hub:db';
 ```
 
-## Dashboard
+## Layout
 
-Located at `/dashboard` (uses the `dashboard` layout):
-- **Form Submissions** (`/dashboard`) — list + CSV/Excel export
-- **User Management** (`/dashboard/users`) — CRUD, superadmin only
+`app/layouts/default.vue` is the dashboard shell (`UDashboardGroup` + sidebar + `UDashboardSearch` with tasks + a mobile bottom nav). Pages wrap their content in `CPage` (`UDashboardPanel` + `UDashboardNavbar`). Mutations go through `useAction()` (toast + error handling + optional confirm).
 
-## Nuxt Studio
+## Worktree note
 
-Visual content editor at https://nuxt.studio.
+When this repo is checked out as a git worktree *inside* another checkout (e.g. `.claude/worktrees/…`), Vite 8's OXC transform can fall back to the parent checkout's `tsconfig.json` and fail with `TSCONFIG_ERROR … ../../../.nuxt/tsconfig.json`. Running `nuxt prepare` in the parent checkout (or creating its `.nuxt/tsconfig.json`) fixes it.
 
-### Dev mode
-
-1. Run `pnpm run dev`
-2. Open `https://localhost:3000/nl`
-3. Click the floating Studio button (top-left). On first use, sign in with GitHub at nuxt.studio.
-
-The Studio module activates automatically in dev mode and mounts a `<nuxt-studio>` web component. Repository auto-detection from `git config remote.origin.url` works once the app is in a git repo.
-
-### Z-index override
-
-Studio's button can be obscured by `<UHeader>` (sticky, high z-index). `app/assets/css/main.css` raises it:
-```css
-nuxt-studio {
-  position: relative;
-  z-index: 9999;
-}
-```
-
-### `studio.i18n.defaultLocale`
-
-Set in `nuxt.config.ts` so Studio knows which collection to default to:
-```ts
-studio: {
-  i18n: { defaultLocale: 'nl' }
-}
-```
-
-For production-deployed Studio (self-hosted), set `studio.repository` explicitly and add `STUDIO_GITHUB_CLIENT_ID` / `STUDIO_GITHUB_CLIENT_SECRET` env vars. For dev + cloud editor, leave commented out.
+Also: don't set `sitemap: { enabled: false }` — it breaks the Nitro build (`#sitemap-virtual/static-config.mjs` resolved without importer). `robots.disallow: ['/']` already keeps the app out of search engines.
 
 ## Critical Nitro Preset Detail
 
@@ -280,7 +182,6 @@ If Vite logs "discovered new dependencies at runtime" for a new package later, a
 1. `@nuxt/ui` - Component library (v4)
 2. `@nuxtjs/i18n` - Internationalization
 3. `@nuxt/scripts` - Script loading optimization
-4. `@nuxt/content` (v3.14.x) - Content management
 5. `@nuxtjs/seo` - SEO optimization (sitemap, robots, og-image, link-checker, schema.org)
    - **schema.org is disabled** via `schemaOrg: { enabled: false }` in `nuxt.config.ts`. The app emits no structured data, and `nuxt-schema-org@6.2.3` crashes under the unhead v3 shipped by Nuxt 4.5.0 (`Cannot read properties of undefined (reading 'push' / 'resolveGraph')`). Re-enable once `nuxt-schema-org` publishes an unhead-v3 fix. All other `@nuxtjs/seo` features stay active.
 6. `@nuxt/eslint` - ESLint integration
@@ -290,7 +191,6 @@ If Vite logs "discovered new dependencies at runtime" for a new package later, a
 10. `nuxt-auth-utils` - Authentication
 11. `@nuxthub/core` - Cloudflare deployment infrastructure
 12. `oxc-nuxt` - Oxlint integration
-13. `nuxt-studio` - Visual content editor
 14. `nuxt-security` - HTTP security headers, CSP, rate limiting
 
 ## Security Headers (`nuxt-security`)

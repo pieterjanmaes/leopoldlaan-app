@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "wotz-nuxt-starter-docs",
+	"name": "leopoldlaan-app-docs",
 	"account_id": "YOUR_CF_ACCOUNT_ID",
 	"main": "./.output/server/index.mjs",
 	"compatibility_date": "2026-04-02",
@@ -21,7 +21,7 @@
 
 	"vars": {
 		"NUXT_SITE_ENV": "production",
-		"NUXT_SITE_URL": "https://docs-wotz-nuxt-starter.workers.dev"
+		"NUXT_SITE_URL": "https://docs-leopoldlaan-app.workers.dev"
 	},
 
 	"env": {
