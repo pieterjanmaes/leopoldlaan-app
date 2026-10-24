@@ -1,10 +1,11 @@
 import { createId } from '@paralleldrive/cuid2';
-import { index, integer, primaryKey, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { index, integer, primaryKey, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 import {
 	ATTACHMENT_ENTITIES,
 	CATEGORY_COLORS,
 	PAYMENT_METHODS,
+	PLAN_MARKER_KINDS,
 	QUOTE_STATUSES,
 	SUBSIDY_STATUSES,
 	TASK_PRIORITIES,
@@ -256,3 +257,40 @@ export const invites = sqliteTable('invites', {
 	createdBy: text('created_by').references(() => users.id, { onDelete: 'set null' }),
 	createdAt: createdAt()
 });
+
+/** One floor of the house, drawn over a plan image from Drive (or a blank grid). */
+export const floorPlans = sqliteTable('floor_plans', {
+	id: id(),
+	name: text('name').notNull(),
+	backgroundFileId: text('background_file_id'),
+	backgroundName: text('background_name'),
+	// Width / height of the background, so the plan keeps its shape at any screen size.
+	aspectRatio: real('aspect_ratio').notNull().default(1.4142),
+	sortOrder: sortOrder(),
+	createdAt: createdAt()
+});
+
+/**
+ * A zone (polygon, usually a room) or a pin (a spot with a note) on a floor plan. Points are fractions of the
+ * plan's width and height (0..1), so markers stay put when the plan is shown larger or smaller.
+ */
+export const planMarkers = sqliteTable(
+	'plan_markers',
+	{
+		id: id(),
+		floorPlanId: text('floor_plan_id')
+			.notNull()
+			.references(() => floorPlans.id, { onDelete: 'cascade' }),
+		kind: text('kind', { enum: PLAN_MARKER_KINDS }).notNull(),
+		label: text('label').notNull().default(''),
+		note: text('note'),
+		color: text('color', { enum: CATEGORY_COLORS }).notNull().default('amber'),
+		points: text('points', { mode: 'json' }).$type<[number, number][]>().notNull(),
+		roomId: text('room_id').references(() => rooms.id, { onDelete: 'set null' }),
+		taskId: text('task_id').references(() => tasks.id, { onDelete: 'set null' }),
+		createdBy: text('created_by').references(() => users.id, { onDelete: 'set null' }),
+		createdAt: createdAt(),
+		updatedAt: updatedAt()
+	},
+	(table) => [index('plan_markers_floor_idx').on(table.floorPlanId)]
+);

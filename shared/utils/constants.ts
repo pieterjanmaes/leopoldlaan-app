@@ -62,6 +62,9 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
 	other: 'Andere'
 };
 
+export const PLAN_MARKER_KINDS = ['zone', 'pin'] as const;
+export type PlanMarkerKind = (typeof PLAN_MARKER_KINDS)[number];
+
 /** Things a Drive file can be attached to. */
 export const ATTACHMENT_ENTITIES = ['task', 'quote', 'expense', 'room', 'contact', 'subsidy'] as const;
 export type AttachmentEntity = (typeof ATTACHMENT_ENTITIES)[number];

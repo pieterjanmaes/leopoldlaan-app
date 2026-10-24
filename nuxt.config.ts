@@ -259,7 +259,16 @@ export default defineNuxtConfig({
 			dedupe: ['vue']
 		},
 		optimizeDeps: {
-			include: ['@userback/widget', 'zod', 'zod/locales', 'sortablejs', 'xlsx', '@internationalized/date']
+			include: [
+				'@userback/widget',
+				'zod',
+				'zod/locales',
+				'sortablejs',
+				'xlsx',
+				'@internationalized/date',
+				'konva',
+				'vue-konva'
+			]
 		}
 	}
 

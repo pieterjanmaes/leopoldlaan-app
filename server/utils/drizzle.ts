@@ -19,3 +19,5 @@ export type Subsidy = Schema['subsidies']['$inferSelect'];
 export type DriveConnection = Schema['driveConnection']['$inferSelect'];
 export type Attachment = Schema['attachments']['$inferSelect'];
 export type Invite = Schema['invites']['$inferSelect'];
+export type FloorPlan = Schema['floorPlans']['$inferSelect'];
+export type PlanMarker = Schema['planMarkers']['$inferSelect'];

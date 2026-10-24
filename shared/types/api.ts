@@ -3,6 +3,7 @@ import type {
 	AttachmentEntity,
 	CategoryColor,
 	PaymentMethod,
+	PlanMarkerKind,
 	QuoteStatus,
 	SubsidyStatus,
 	TaskPriority,
@@ -238,4 +239,27 @@ export interface InviteLookup {
 	email: string;
 	name: string | null;
 	inviterName: string | null;
+}
+
+export interface PlanMarkerView {
+	id: string;
+	floorPlanId: string;
+	kind: PlanMarkerKind;
+	label: string;
+	note: string | null;
+	color: CategoryColor;
+	/** Fractions (0..1) of the plan's width and height. */
+	points: [number, number][];
+	roomId: string | null;
+	taskId: string | null;
+}
+
+export interface FloorPlanView {
+	id: string;
+	name: string;
+	backgroundFileId: string | null;
+	backgroundName: string | null;
+	aspectRatio: number;
+	sortOrder: number;
+	markers: PlanMarkerView[];
 }
