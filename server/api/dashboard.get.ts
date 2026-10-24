@@ -3,6 +3,7 @@ import { db } from 'hub:db';
 import { TASK_STATUSES } from '../../shared/utils/constants';
 import { addDays, startOfWeek, todayIso } from '../../shared/utils/dates';
 import { isBlocked } from '../../shared/utils/dependencies';
+import { needsOrdering } from '../../shared/utils/materials';
 import { isInternal } from '../../shared/utils/permissions';
 import { desc, tables } from '../utils/drizzle';
 
@@ -72,6 +73,7 @@ export default defineEventHandler(async (event): Promise<DashboardView> => {
 		recentFiles,
 		openDecisions: internal
 			? (await listDecisions()).filter((decision) => decision.status === 'open').slice(0, LIST_LIMIT)
-			: []
+			: [],
+		toOrder: internal ? (await listMaterials()).filter((item) => needsOrdering(item, today)).slice(0, LIST_LIMIT) : []
 	};
 });

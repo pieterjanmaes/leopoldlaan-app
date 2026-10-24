@@ -72,6 +72,24 @@ export const DECISION_STATUS_META: Record<DecisionStatus, { label: string; icon:
 	replaced: { label: 'Vervangen', icon: 'i-lucide-history', color: 'neutral' }
 };
 
+export const MATERIAL_STATUSES = ['needed', 'ordered', 'delivered'] as const;
+export type MaterialStatus = (typeof MATERIAL_STATUSES)[number];
+
+export const MATERIAL_STATUS_META: Record<MaterialStatus, { label: string; icon: string; color: BadgeColor }> = {
+	needed: { label: 'Te kopen', icon: 'i-lucide-shopping-cart', color: 'warning' },
+	ordered: { label: 'Besteld', icon: 'i-lucide-truck', color: 'info' },
+	delivered: { label: 'Geleverd', icon: 'i-lucide-package-check', color: 'success' }
+};
+
+export const MATERIAL_UNITS = ['st', 'm²', 'm', 'm³', 'l', 'kg', 'doos', 'rol', 'zak', 'pak', 'set'] as const;
+export type MaterialUnit = (typeof MATERIAL_UNITS)[number];
+
+/** Store-bought materials carry 21% VAT; the 6% renovation rate only applies when a contractor supplies and installs. */
+export const MATERIAL_VAT_RATE = 21;
+
+/** Warn this many days before a material is needed on site while it hasn't been ordered yet. */
+export const ORDER_WARNING_DAYS = 14;
+
 export const PLAN_MARKER_KINDS = ['zone', 'pin'] as const;
 export type PlanMarkerKind = (typeof PLAN_MARKER_KINDS)[number];
 

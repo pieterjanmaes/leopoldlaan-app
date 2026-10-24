@@ -10,6 +10,7 @@ Built on the WOTZ Nuxt starter: Nuxt 4, Nuxt UI 4, NuxtHub (Cloudflare Workers +
 |---|---|
 | **Overzicht** (`/`) | Open tasks, progress, expected cost, unpaid invoices, this week, overdue, blocked tasks, budget per category, recent files |
 | **Taken** (`/taken`) | Kanban board (drag & drop, long-press on touch) and list view, filters, quick add, detail slideover with dependencies, comments and Drive attachments |
+| **Aankopen** (`/aankopen`) | Shopping list per room or store with quick add ("12 m² vloertegels"), statuses, order warnings based on the linked task's start, and "Maak factuur" to book a receipt into the budget |
 | **Beslissingen** (`/beslissingen`) | Decisions log: what still has to be chosen (with a deadline) and what was decided, by whom, why, and the exact product reference. Attachments for samples and datasheets |
 | **Planning** (`/planning`) | Gantt chart grouped by phase, coloured by category, milestones, today line, zoom; flags tasks that start before a task they wait for |
 | **Grondplan** (`/grondplan`) | One plan per floor: an image from Drive (e.g. an export from [openPlan3D](https://github.com/laanlabs/openPlan3D) or the architect's plan) or a blank grid. Draw zones (rooms) and drop numbered pins with a note, colour, room and linked task. Zoom, pan, drag pins. Built with `vue-konva` |
@@ -61,7 +62,7 @@ How it works: `server/routes/auth/google-drive.get.ts` runs the OAuth flow with 
 
 ## Data model
 
-`server/db/schema.ts` — money is integer **cents**, calendar dates are `'YYYY-MM-DD'` text, ids are CUID2. Tables: `users`, `project` (single row), `rooms`, `categories`, `phases`, `contacts`, `tasks`, `task_dependencies`, `task_comments`, `budget_lines`, `quotes`, `expenses`, `subsidies`, `drive_connection` (single row), `attachments` (Drive file ↔ task/quote/expense/…), `invites`, `decisions`, `floor_plans` and `plan_markers` (points stored as 0..1 fractions of the plan, so markers stay put at any size).
+`server/db/schema.ts` — money is integer **cents**, calendar dates are `'YYYY-MM-DD'` text, ids are CUID2. Tables: `users`, `project` (single row), `rooms`, `categories`, `phases`, `contacts`, `tasks`, `task_dependencies`, `task_comments`, `budget_lines`, `quotes`, `expenses`, `subsidies`, `drive_connection` (single row), `attachments` (Drive file ↔ task/quote/expense/…), `invites`, `materials`, `decisions`, `floor_plans` and `plan_markers` (points stored as 0..1 fractions of the plan, so markers stay put at any size).
 
 Pure logic lives in `shared/utils/` (budget forecast, VAT, dates, dependency checks) and is unit-tested in `test/unit/`.
 

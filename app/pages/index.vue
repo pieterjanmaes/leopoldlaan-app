@@ -107,6 +107,42 @@
 					<CCategoryBudgetBars :categories="dashboard.budget.categories" />
 				</UCard>
 
+				<UCard v-if="internal && dashboard.toOrder.length">
+					<template #header>
+						<CSectionHeading
+							size="sm"
+							title="Te bestellen"
+							:description="`Nodig op de werf binnen ${ORDER_WARNING_DAYS} dagen`">
+							<template #actions>
+								<UButton
+									to="/aankopen"
+									label="Aankopen"
+									trailingIcon="i-lucide-arrow-right"
+									color="neutral"
+									variant="link"
+									size="sm" />
+							</template>
+						</CSectionHeading>
+					</template>
+					<ul class="divide-default divide-y">
+						<li
+							v-for="item in dashboard.toOrder"
+							:key="item.id"
+							class="flex items-center gap-3 py-2">
+							<UIcon
+								name="i-lucide-shopping-cart"
+								class="text-warning size-4 shrink-0" />
+							<span class="text-highlighted min-w-0 flex-1 truncate text-sm font-medium">{{ item.name }}</span>
+							<span
+								v-if="item.effectiveNeededBy"
+								class="shrink-0 text-xs"
+								:class="item.effectiveNeededBy < today ? 'text-error font-medium' : 'text-muted'">
+								{{ dueLabel(item.effectiveNeededBy, today) }}
+							</span>
+						</li>
+					</ul>
+				</UCard>
+
 				<UCard v-if="internal">
 					<template #header>
 						<CSectionHeading

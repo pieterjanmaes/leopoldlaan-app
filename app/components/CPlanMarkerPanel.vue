@@ -103,6 +103,16 @@
 			</ul>
 		</div>
 
+		<UButton
+			v-if="roomPurchases.length"
+			:to="{ path: '/aankopen', query: { ruimte: state.roomId } }"
+			icon="i-lucide-shopping-cart"
+			:label="`${roomPurchases.length} ${roomPurchases.length === 1 ? 'aankoop' : 'aankopen'} voor deze ruimte`"
+			color="neutral"
+			variant="outline"
+			size="sm"
+			block />
+
 		<div
 			v-if="roomTasks.length"
 			class="space-y-1">
@@ -142,6 +152,7 @@
 	const { roomOptions } = useLookups();
 	const { tasks } = useTasks();
 	const { decisions } = useDecisions();
+	const { materials } = useMaterials();
 
 	function fromMarker(marker: PlanMarkerView) {
 		return {
@@ -165,6 +176,9 @@
 		state.roomId
 			? decisions.value.filter((decision) => decision.roomId === state.roomId && decision.status !== 'replaced')
 			: []
+	);
+	const roomPurchases = computed(() =>
+		state.roomId ? materials.value.filter((item) => item.roomId === state.roomId && item.status !== 'delivered') : []
 	);
 	const roomTasks = computed(() =>
 		state.roomId ? tasks.value.filter((task) => task.roomId === state.roomId && task.status !== 'done') : []

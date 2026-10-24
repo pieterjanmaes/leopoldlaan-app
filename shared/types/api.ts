@@ -3,6 +3,8 @@ import type {
 	AttachmentEntity,
 	CategoryColor,
 	DecisionStatus,
+	MaterialStatus,
+	MaterialUnit,
 	PaymentMethod,
 	PlanMarkerKind,
 	QuoteStatus,
@@ -188,6 +190,8 @@ export interface DashboardView {
 	recentFiles: AttachmentView[];
 	/** Open decisions, soonest deadline first; empty for externals. */
 	openDecisions: DecisionView[];
+	/** Not ordered yet and needed on site within ORDER_WARNING_DAYS (or already late); empty for externals. */
+	toOrder: MaterialView[];
 }
 
 export interface DriveStatus {
@@ -282,4 +286,28 @@ export interface DecisionView {
 	reference: string | null;
 	attachmentCount: number;
 	updatedAt: string;
+}
+
+export interface MaterialView {
+	id: string;
+	name: string;
+	quantity: number;
+	unit: MaterialUnit;
+	unitPriceCents: number | null;
+	/** quantity × unit price, or null without a price. */
+	totalCents: number | null;
+	status: MaterialStatus;
+	neededBy: string | null;
+	/** neededBy, or the linked task's start date. */
+	effectiveNeededBy: string | null;
+	orderedOn: string | null;
+	deliveredOn: string | null;
+	roomId: string | null;
+	categoryId: string | null;
+	contactId: string | null;
+	taskId: string | null;
+	decisionId: string | null;
+	expenseId: string | null;
+	url: string | null;
+	notes: string | null;
 }

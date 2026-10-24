@@ -5,6 +5,8 @@ import {
 	ATTACHMENT_ENTITIES,
 	CATEGORY_COLORS,
 	DECISION_STATUSES,
+	MATERIAL_STATUSES,
+	MATERIAL_UNITS,
 	PAYMENT_METHODS,
 	PLAN_MARKER_KINDS,
 	QUOTE_STATUSES,
@@ -323,4 +325,36 @@ export const decisions = sqliteTable(
 		updatedAt: updatedAt()
 	},
 	(table) => [index('decisions_status_idx').on(table.status), index('decisions_room_idx').on(table.roomId)]
+);
+
+/** Something to buy for the works: the shopping list, from "needed" to "delivered", and later an invoice. */
+export const materials = sqliteTable(
+	'materials',
+	{
+		id: id(),
+		name: text('name').notNull(),
+		quantity: real('quantity').notNull().default(1),
+		unit: text('unit', { enum: MATERIAL_UNITS }).notNull().default('st'),
+		/** Incl. VAT, per unit; the line total is quantity × unit price. */
+		unitPriceCents: integer('unit_price_cents'),
+		status: text('status', { enum: MATERIAL_STATUSES }).notNull().default('needed'),
+		/** When it has to be on site; falls back to the linked task's start date. */
+		neededBy: text('needed_by'),
+		orderedOn: text('ordered_on'),
+		deliveredOn: text('delivered_on'),
+		roomId: text('room_id').references(() => rooms.id, { onDelete: 'set null' }),
+		categoryId: text('category_id').references(() => categories.id, { onDelete: 'set null' }),
+		contactId: text('contact_id').references(() => contacts.id, { onDelete: 'set null' }),
+		taskId: text('task_id').references(() => tasks.id, { onDelete: 'set null' }),
+		decisionId: text('decision_id').references(() => decisions.id, { onDelete: 'set null' }),
+		/** Set once the purchase is booked as an invoice, so the budget doesn't count it twice. */
+		expenseId: text('expense_id').references(() => expenses.id, { onDelete: 'set null' }),
+		url: text('url'),
+		notes: text('notes'),
+		sortOrder: sortOrder(),
+		createdBy: text('created_by').references(() => users.id, { onDelete: 'set null' }),
+		createdAt: createdAt(),
+		updatedAt: updatedAt()
+	},
+	(table) => [index('materials_status_idx').on(table.status), index('materials_room_idx').on(table.roomId)]
 );

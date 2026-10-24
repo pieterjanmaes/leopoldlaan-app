@@ -44,7 +44,7 @@
 			class="text-muted flex flex-wrap gap-4 text-xs">
 			<span class="flex items-center gap-1.5"><span class="bg-primary size-2.5 rounded-full" /> Betaald</span>
 			<span class="flex items-center gap-1.5"
-				><span class="bg-primary/35 size-2.5 rounded-full" /> Gefactureerd of goedgekeurd</span
+				><span class="bg-primary/35 size-2.5 rounded-full" /> Gefactureerd, goedgekeurd of te kopen</span
 			>
 			<span class="flex items-center gap-1.5"
 				><span class="bg-elevated size-2.5 rounded-full" /> Rest van het budget</span
@@ -66,7 +66,7 @@
 			.map((entry) => {
 				const category = entry.categoryId ? categoryById.value.get(entry.categoryId) : undefined;
 				const scale = Math.max(entry.plannedCents, entry.forecastCents, 1);
-				const known = Math.max(entry.invoicedCents, entry.committedCents);
+				const known = Math.max(entry.invoicedCents, entry.committedCents) + entry.purchasesCents;
 				const over = entry.plannedCents > 0 && entry.forecastCents > entry.plannedCents;
 
 				return {
@@ -81,8 +81,11 @@
 						`Gepland ${formatPrice(entry.plannedCents)}`,
 						`goedgekeurd ${formatPrice(entry.committedCents)}`,
 						`gefactureerd ${formatPrice(entry.invoicedCents)}`,
-						`betaald ${formatPrice(entry.paidCents)}`
-					].join(' · ')
+						`betaald ${formatPrice(entry.paidCents)}`,
+						entry.purchasesCents ? `nog te kopen ${formatPrice(entry.purchasesCents)}` : ''
+					]
+						.filter(Boolean)
+						.join(' · ')
 				};
 			})
 			.sort((a, b) => a.sortOrder - b.sortOrder)

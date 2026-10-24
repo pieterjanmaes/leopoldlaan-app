@@ -12,9 +12,10 @@ export interface NavEntry {
 export const PRIMARY_NAV: NavEntry[] = [
 	{ label: 'Overzicht', icon: 'i-lucide-layout-dashboard', to: '/', external: true, mobile: true, shortcut: 'g-o' },
 	{ label: 'Taken', icon: 'i-lucide-list-checks', to: '/taken', external: true, mobile: true, shortcut: 'g-t' },
+	{ label: 'Aankopen', icon: 'i-lucide-shopping-cart', to: '/aankopen', mobile: true, shortcut: 'g-a' },
 	{ label: 'Beslissingen', icon: 'i-lucide-scale', to: '/beslissingen', mobile: true, shortcut: 'g-d' },
 	{ label: 'Planning', icon: 'i-lucide-calendar-range', to: '/planning', shortcut: 'g-p' },
-	{ label: 'Grondplan', icon: 'i-lucide-map', to: '/grondplan', mobile: true, shortcut: 'g-g' },
+	{ label: 'Grondplan', icon: 'i-lucide-map', to: '/grondplan', shortcut: 'g-g' },
 	{ label: 'Budget', icon: 'i-lucide-wallet', to: '/budget', mobile: true, shortcut: 'g-b' },
 	{ label: 'Bestanden', icon: 'i-lucide-folder-open', to: '/bestanden', shortcut: 'g-f' }
 ];

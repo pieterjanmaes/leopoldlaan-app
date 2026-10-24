@@ -113,13 +113,13 @@ This project uses **Nuxt 4 directory structure** where `app/` is the source fold
 
 Dutch only: `@nuxtjs/i18n` stays for formatting/locale plumbing with one `nl` locale and `strategy: 'no_prefix'`, so URLs have no locale prefix. Nuxt Content and Nuxt Studio were removed (the app has no public content pages). UI strings live in the components in Dutch; Zod messages are Dutch via `useZodLocale()`.
 
-App routes: `/` (overview), `/taken`, `/beslissingen`, `/planning`, `/grondplan`, `/budget`, `/bestanden`, `/contacten`, `/instellingen`, `/account`, `/login`, `/registreer`. `app/middleware/auth.global.ts` sends anonymous visitors to `/login`; `internal` middleware keeps externals out of household-only pages.
+App routes: `/` (overview), `/taken`, `/aankopen`, `/beslissingen`, `/planning`, `/grondplan`, `/budget`, `/bestanden`, `/contacten`, `/instellingen`, `/account`, `/login`, `/registreer`. `app/middleware/auth.global.ts` sends anonymous visitors to `/login`; `internal` middleware keeps externals out of household-only pages.
 
 ## Database Schema
 
 Located in `server/db/schema.ts`. Conventions: CUID2 text ids, money as integer **cents**, calendar dates as `'YYYY-MM-DD'` text (no timezone shifts), moments as integer timestamps, enums from `shared/utils/constants.ts`. Inferred row types are exported from `server/utils/drizzle.ts`; API response shapes are in `shared/types/api.ts`; input schemas (Zod, shared by forms and endpoints) in `shared/schemas/`.
 
-Tables: `users` (role `owner | member | external`, optional `contactId`), `project` (single row `id='main'`), `rooms`, `categories` (werkposten, with colour + icon), `phases` (incl. milestones), `contacts`, `tasks`, `task_dependencies`, `task_comments`, `budget_lines`, `quotes`, `expenses`, `subsidies`, `drive_connection` (single row, encrypted refresh token), `attachments` (Drive file ↔ entity), `invites` (hashed token), `decisions` (open/decided/replaced, `decisionStamps()` sets decided on/by), `floor_plans` + `plan_markers` (zones/pins; `points` is JSON of `[x, y]` fractions 0..1 of the plan).
+Tables: `users` (role `owner | member | external`, optional `contactId`), `project` (single row `id='main'`), `rooms`, `categories` (werkposten, with colour + icon), `phases` (incl. milestones), `contacts`, `tasks`, `task_dependencies`, `task_comments`, `budget_lines`, `quotes`, `expenses`, `subsidies`, `drive_connection` (single row, encrypted refresh token), `attachments` (Drive file ↔ entity), `invites` (hashed token), `materials` (shopping list; unpriced or invoiced items don't count as expected cost, `POST /api/materials/invoice` books selected items as one expense), `decisions` (open/decided/replaced, `decisionStamps()` sets decided on/by), `floor_plans` + `plan_markers` (zones/pins; `points` is JSON of `[x, y]` fractions 0..1 of the plan).
 
 Floor plans render with `vue-konva` (registered in `app/plugins/vueKonva.client.ts`, so `CFloorPlanCanvas` must stay inside `<ClientOnly>`). Canvas colours come from `app/utils/colors.ts` because Konva needs real colour values, not Tailwind classes.
 

@@ -18,6 +18,13 @@ export interface ExpenseInput {
 	paidOn: string | null;
 }
 
+export interface PurchaseInput {
+	categoryId: string | null;
+	totalCents: number | null;
+	/** Purchases already booked on an invoice are counted there instead. */
+	expenseId: string | null;
+}
+
 export interface CategoryBudget {
 	categoryId: string | null;
 	plannedCents: number;
@@ -26,6 +33,8 @@ export interface CategoryBudget {
 	/** Sum of all invoices, paid or not. */
 	invoicedCents: number;
 	paidCents: number;
+	/** Shopping-list items with a price that aren't on an invoice yet. */
+	purchasesCents: number;
 	/** Best estimate of what this category will finally cost. */
 	forecastCents: number;
 }
@@ -33,7 +42,15 @@ export interface CategoryBudget {
 function bucket(map: Map<string | null, CategoryBudget>, categoryId: string | null): CategoryBudget {
 	let entry = map.get(categoryId);
 	if (!entry) {
-		entry = { categoryId, plannedCents: 0, committedCents: 0, invoicedCents: 0, paidCents: 0, forecastCents: 0 };
+		entry = {
+			categoryId,
+			plannedCents: 0,
+			committedCents: 0,
+			invoicedCents: 0,
+			paidCents: 0,
+			purchasesCents: 0,
+			forecastCents: 0
+		};
 		map.set(categoryId, entry);
 	}
 
@@ -42,12 +59,14 @@ function bucket(map: Map<string | null, CategoryBudget>, categoryId: string | nu
 
 /**
  * Forecast per category: invoices already received, plus the part of approved quotes not invoiced yet, plus
- * whatever is planned but not covered by a quote or invoice. Invoices tied to a quote count against that quote.
+ * shopping-list items not invoiced yet — or the plan, when that is higher. Invoices tied to a quote count against
+ * that quote; purchases booked on an invoice count as that invoice.
  */
 export function summarizeBudget(
 	lines: BudgetInput[],
 	quotes: QuoteInput[],
-	expenses: ExpenseInput[]
+	expenses: ExpenseInput[],
+	purchases: PurchaseInput[] = []
 ): CategoryBudget[] {
 	const map = new Map<string | null, CategoryBudget>();
 
@@ -75,9 +94,15 @@ export function summarizeBudget(
 		}
 	}
 
+	for (const purchase of purchases) {
+		if (!purchase.expenseId && purchase.totalCents) {
+			bucket(map, purchase.categoryId).purchasesCents += purchase.totalCents;
+		}
+	}
+
 	for (const entry of map.values()) {
 		const openCommitted = Math.max(entry.committedCents - (invoicedAgainstQuotes.get(entry.categoryId) ?? 0), 0);
-		const known = entry.invoicedCents + openCommitted;
+		const known = entry.invoicedCents + openCommitted + entry.purchasesCents;
 		entry.forecastCents = Math.max(known, entry.plannedCents);
 	}
 
