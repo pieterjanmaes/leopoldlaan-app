@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Developer docs site:** Full human-readable documentation lives in `docs/` — a Docus-based Nuxt site organized by topic (getting-started, content, i18n, database, auth, security, deployment, troubleshooting). Source markdown is at `docs/content/**`. When updating CLAUDE.md or README.md, also consider whether the change belongs in `docs/content/`.
+**Developer docs site:** Full human-readable documentation lives in `docs/` — a Docus-based Nuxt site organized by topic (getting-started, features, users-and-roles, google-drive, development, database, security, deployment, troubleshooting, roadmap — the last one holds the feature ideas, technical checklist and Flemish renovation tips). Source markdown is at `docs/content/**`. When updating CLAUDE.md or README.md, also consider whether the change belongs in `docs/content/`.
 
 **Live-talk presentation:** A Slidev deck about the project lives in `presentation/slides.md` (~30 slides, tech-talk format). When the project architecture changes meaningfully, consider whether the slides need updating too — speaker notes reference specific code paths and gotchas.
 

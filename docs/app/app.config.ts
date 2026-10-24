@@ -1,15 +1,15 @@
 export default defineAppConfig({
 	docus: {
-		name: 'WOTZ Nuxt Starter',
-		description: 'A production-ready Nuxt 4 starter template by Who Owns The Zebra — multilingual, Cloudflare-deployed, with Studio, Drizzle, and a full admin dashboard.',
+		name: 'Leopoldlaan',
+		description: 'Developer docs for the Leopoldlaan renovation app — tasks, planning, floor plans, budget and Google Drive.',
 		socials: {
-			github: 'wotzebra/wotz-nuxt-starter'
+			github: 'pieterjanmaes/leopoldlaan-app'
 		}
 	},
 	ui: {
 		colors: {
-			primary: 'violet',
-			neutral: 'zinc'
+			primary: 'amber',
+			neutral: 'stone'
 		}
 	}
 });
