@@ -36,11 +36,13 @@
 	const { user } = useUserSession();
 	const logout = useLogout();
 	const colorMode = useColorMode();
+	const { canInstall, installApp } = useInstallApp();
 
 	const menuItems = computed<DropdownMenuItem[][]>(() => [
 		[{ label: user.value?.email ?? '', type: 'label' }],
 		[
 			{ label: 'Mijn account', icon: 'i-lucide-user', to: '/account' },
+			...(canInstall.value ? [{ label: 'Installeer als app', icon: 'i-lucide-smartphone', onSelect: installApp }] : []),
 			{
 				label: colorMode.value === 'dark' ? 'Lichte modus' : 'Donkere modus',
 				icon: colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon',

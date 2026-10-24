@@ -150,6 +150,13 @@
 		if (task) await refresh();
 	}
 
+	// The app's home-screen shortcut "Nieuwe taak" lands on /taken?nieuw=1.
+	onMounted(() => {
+		if (route.query.nieuw === undefined || !internal.value) return;
+		void router.replace({ query: { ...route.query, nieuw: undefined } });
+		void openCreate();
+	});
+
 	const quickTitle = ref('');
 	const { run: quickAdd, pending: quickPending } = useAction(
 		() =>

@@ -16,6 +16,19 @@
 		</UPageCard>
 
 		<UPageCard
+			v-if="canInstall"
+			title="App op je gsm"
+			description="Zet de app op je beginscherm: één tik om te openen, schermvullend, en foto's nemen op de werf gaat sneller."
+			variant="subtle">
+			<div>
+				<UButton
+					icon="i-lucide-smartphone"
+					label="Installeer als app"
+					@click="installApp" />
+			</div>
+		</UPageCard>
+
+		<UPageCard
 			title="Wachtwoord wijzigen"
 			description="Andere toestellen worden daarna afgemeld."
 			variant="subtle">
@@ -57,6 +70,7 @@
 	useZodLocale();
 
 	const { user } = useUserSession();
+	const { canInstall, installApp } = useInstallApp();
 	const state = reactive({ currentPassword: '', newPassword: '' });
 
 	const { run: changePassword, pending } = useAction(

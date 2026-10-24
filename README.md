@@ -15,6 +15,7 @@ Built on the WOTZ Nuxt starter: Nuxt 4, Nuxt UI 4, NuxtHub (Cloudflare Workers +
 | **Budget** (`/budget`) | Budget lines, quotes, invoices and subsidies (premies). Forecast per category = invoices + open approved quotes, or the plan when that's higher. Contingency buffer, Excel export of invoices |
 | **Bestanden** (`/bestanden`) | Browser for the project folder in Google Drive: folders, upload (drag & drop), previews |
 | **Contacten** (`/contacten`) | Contractors, suppliers, architect… |
+| **Phone app** | Installable PWA (manifest, icons, home-screen shortcuts); *Installeer als app* in the account menu, with a step-by-step guide on iPhone |
 | **Instellingen** (`/instellingen`) | Project, Drive connection, categories (werkposten), rooms, phases & milestones, users and invites |
 
 ### Roles
@@ -96,4 +97,4 @@ Then seed once with `curl -X POST -H "x-seed-key: …" https://<domain>/api/seed
 ## Ideas for later
 
 - **AI**: scan an invoice or quote (photo/PDF → amount, VAT, supplier, date), a chat assistant over your own data ("how much is left for the bathroom?"), generate a task plan from a description. The schema already stores everything structured for this.
-- Weekly e-mail digest via a cron trigger (see `boswachter-app`), PWA manifest for an app icon on the phone, a site diary with photos.
+- Weekly e-mail digest via a cron trigger (see `boswachter-app`), offline support for the phone app, a site diary with photos.

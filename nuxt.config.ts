@@ -6,7 +6,29 @@ export default defineNuxtConfig({
 			class: 'min-h-full h-[1px] relative'
 		},
 		head: {
-			viewport: 'width=device-width, initial-scale=1.0, viewport-fit=cover'
+			viewport: 'width=device-width, initial-scale=1.0, viewport-fit=cover',
+			// Installable as a phone app (PWA): manifest + icons, no service worker, so data is never served stale.
+			link: [
+				{ rel: 'manifest', href: '/manifest.webmanifest' },
+				{ rel: 'icon', type: 'image/svg+xml', href: '/icons/icon.svg' },
+				{ rel: 'icon', type: 'image/png', sizes: '32x32', href: '/icons/favicon-32.png' },
+				{ rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' }
+			],
+			meta: [
+				{ name: 'theme-color', content: '#ffffff', media: '(prefers-color-scheme: light)' },
+				{ name: 'theme-color', content: '#1c1917', media: '(prefers-color-scheme: dark)' },
+				{ name: 'mobile-web-app-capable', content: 'yes' },
+				{ name: 'apple-mobile-web-app-capable', content: 'yes' },
+				{ name: 'apple-mobile-web-app-title', content: 'Leopoldlaan' },
+				{ name: 'apple-mobile-web-app-status-bar-style', content: 'default' }
+			],
+			// Chrome fires beforeinstallprompt once, often before Nuxt has booted; park it for usePwaInstall().
+			script: [
+				{
+					innerHTML:
+						"window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__installPrompt=e;window.dispatchEvent(new Event('installpromptready'))});"
+				}
+			]
 		}
 	},
 
