@@ -1,3 +1,5 @@
+import { sendRedirect, type RequestEvent } from 'nuxt/server';
+
 /**
  * Connects the project's Google Drive. Only the owner does this once; everyone else reaches the files through
  * the server, so contractors don't need a Google account. Register `<site>/auth/google-drive` as redirect URI.
@@ -11,11 +13,13 @@ const oauth = defineOAuthGoogleEventHandler({
 			prompt: 'consent'
 		}
 	},
+	// nuxt-auth-utils 0.6 hands these callbacks a `nuxt/server` RequestEvent, so redirect with `nuxt/server` helpers.
 	async onSuccess(event, { user: googleUser, tokens }) {
-		const owner = await requireOwner(event);
 		if (!tokens.refresh_token) {
 			return sendRedirect(event, '/instellingen?drive=no-refresh-token');
 		}
+		// The route handler below already checked the owner role against the database.
+		const { user: owner } = await requireUserSession(event);
 
 		await saveDriveConnection({
 			googleEmail: googleUser.email,
@@ -38,5 +42,6 @@ const oauth = defineOAuthGoogleEventHandler({
 export default defineEventHandler(async (event) => {
 	await requireOwner(event);
 
-	return oauth(event);
+	// On Nuxt 4 this h3 event is what `nuxt/server` handlers receive at runtime (they fall back to `event.req.url`).
+	return oauth(event as unknown as RequestEvent);
 });
