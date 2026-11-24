@@ -31,8 +31,6 @@
     }
   ],
   "vars": {
-    "NUXT_SITE_ENV": "production",
-    "NUXT_SITE_URL": "https://your-production-domain.com",
     "NUXT_PUBLIC_TURNSTILE_SITE_KEY": "YOUR_TURNSTILE_SITE_KEY"
   },
   // Secrets (sensitive data - use `wrangler secret put <NAME>`)
@@ -57,8 +55,6 @@
         }
       ],
       "vars": {
-        "NUXT_SITE_ENV": "staging",
-        "NUXT_SITE_URL": "https://your-preview-domain.workers.dev",
         "NUXT_PUBLIC_TURNSTILE_SITE_KEY": "YOUR_TURNSTILE_SITE_KEY"
       }
     }

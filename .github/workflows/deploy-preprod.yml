@@ -42,9 +42,7 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           # Build environment
-          NUXT_SITE_ENV: preprod
           NUXT_PRERENDER: 'true'
-          NUXT_SITE_URL: ${{ vars.NUXT_SITE_URL }}
           NUXT_APP_SECRET: ${{ secrets.NUXT_APP_SECRET }}
           NUXT_TURNSTILE_SECRET_KEY: ${{ secrets.NUXT_TURNSTILE_SECRET_KEY }}
           SEED_KEY: ${{ secrets.SEED_KEY }}

@@ -12,7 +12,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Nuxt UI v4** as component library with Tailwind CSS v4 (dashboard components throughout)
 - **i18n** with Dutch only (`strategy: 'no_prefix'`); UI strings are written in Dutch directly in components
 - **NuxtHub** for deployment infrastructure with D1 database
-- **SEO modules** for search optimization
 - **Authentication** with nuxt-auth-utils
 - **Database** with Drizzle ORM (D1/SQLite)
 - **Oxlint + Oxfmt** for fast linting and formatting (paired with ESLint for stylistic rules)
@@ -146,7 +145,9 @@ import { db } from 'hub:db';
 
 When this repo is checked out as a git worktree *inside* another checkout (e.g. `.claude/worktrees/…`), Vite 8's OXC transform can fall back to the parent checkout's `tsconfig.json` and fail with `TSCONFIG_ERROR … ../../../.nuxt/tsconfig.json`. Running `nuxt prepare` in the parent checkout (or creating its `.nuxt/tsconfig.json`) fixes it.
 
-Also: don't set `sitemap: { enabled: false }` — it breaks the Nitro build (`#sitemap-virtual/static-config.mjs` resolved without importer). `robots.disallow: ['/']` already keeps the app out of search engines.
+## Search engines
+
+This is a private app, so there is no SEO module (`@nuxtjs/seo` was removed: no sitemap, OG images or schema.org). Search engines are kept out by `public/robots.txt` (`Disallow: /`) plus an `X-Robots-Tag: noindex, nofollow` header on every response (`routeRules['/**']` in `nuxt.config.ts`). Don't add SEO modules back.
 
 ## Critical Nitro Preset Detail
 
@@ -171,7 +172,7 @@ vite: {
 }
 ```
 
-`@vue/devtools-core` / `@vue/devtools-kit` were previously in `optimizeDeps.include`, but Vite 8 (Nuxt 4.5.0) can no longer resolve those entry paths, so they only produced a `NUXT_B7002` "could not be resolved" warning. They were dropped — `resolve.dedupe` already covers the duplicate-Vue case, so nothing is lost. `@unhead/schema-org/vue` was also dropped because schema.org is disabled (see below).
+`@vue/devtools-core` / `@vue/devtools-kit` were previously in `optimizeDeps.include`, but Vite 8 (Nuxt 4.5.0) can no longer resolve those entry paths, so they only produced a `NUXT_B7002` "could not be resolved" warning. They were dropped — `resolve.dedupe` already covers the duplicate-Vue case, so nothing is lost.
 
 `@nuxt/content`'s mdc module injects its own `@nuxtjs/mdc > <dep>` entries into `optimizeDeps.include` that Vite 8 also can't resolve (two `@nuxtjs/mdc` versions end up in the tree), producing the same `NUXT_B7002` warning — but those aren't in our config, they're module-injected. A `vite:extendConfig` hook in `nuxt.config.ts` strips any `@nuxtjs/mdc > …` entries from the merged Vite config before Vite sees them. It's behaviour-neutral (Vite already skips unresolvable entries) and just silences the warning; remove the hook once `@nuxt/content` ships a fix.
 
@@ -182,16 +183,14 @@ If Vite logs "discovered new dependencies at runtime" for a new package later, a
 1. `@nuxt/ui` - Component library (v4)
 2. `@nuxtjs/i18n` - Internationalization
 3. `@nuxt/scripts` - Script loading optimization
-5. `@nuxtjs/seo` - SEO optimization (sitemap, robots, og-image, link-checker, schema.org)
-   - **schema.org is disabled** via `schemaOrg: { enabled: false }` in `nuxt.config.ts`. The app emits no structured data, and `nuxt-schema-org@6.2.3` crashes under the unhead v3 shipped by Nuxt 4.5.0 (`Cannot read properties of undefined (reading 'push' / 'resolveGraph')`). Re-enable once `nuxt-schema-org` publishes an unhead-v3 fix. All other `@nuxtjs/seo` features stay active.
-6. `@nuxt/eslint` - ESLint integration
-7. `@nuxt/image` - Image optimization
-8. `@nuxtjs/turnstile` - Cloudflare Turnstile (bot protection)
-9. `@vueuse/nuxt` - VueUse composables
-10. `nuxt-auth-utils` - Authentication
-11. `@nuxthub/core` - Cloudflare deployment infrastructure
-12. `oxc-nuxt` - Oxlint integration
-14. `nuxt-security` - HTTP security headers, CSP, rate limiting
+4. `@nuxt/eslint` - ESLint integration
+5. `@nuxt/image` - Image optimization
+6. `@nuxtjs/turnstile` - Cloudflare Turnstile (bot protection)
+7. `@vueuse/nuxt` - VueUse composables
+8. `nuxt-auth-utils` - Authentication
+9. `@nuxthub/core` - Cloudflare deployment infrastructure
+10. `oxc-nuxt` - Oxlint integration
+11. `nuxt-security` - HTTP security headers, CSP, rate limiting
 
 ## Security Headers (`nuxt-security`)
 
@@ -300,8 +299,6 @@ Read during `nuxt build` and embedded into the client JavaScript. **Visible to a
 
 | Variable | Purpose |
 |---|---|
-| `NUXT_SITE_ENV` | `production` \| `staging` — controls robots.txt |
-| `NUXT_SITE_URL` | Public URL for SEO, sitemap, OG images |
 | `NUXT_PUBLIC_TURNSTILE_SITE_KEY` | Public Turnstile site key |
 | `NUXT_PUBLIC_USERBACK_TOKEN` | Optional Userback token |
 | `NUXT_PUBLIC_GOOGLE_TAG_MANAGER_ID` | Optional GTM container ID |
@@ -316,7 +313,6 @@ Read by server endpoints at request time via `runtimeConfig`. Never put real val
 |---|---|
 | `NUXT_APP_SECRET` | Nuxt app secret; nuxt-auth-utils derives the session-cookie key from it (32+ random chars) |
 | `NUXT_TURNSTILE_SECRET_KEY` | Server-side Turnstile verification |
-| `NUXT_OG_IMAGE_SECRET` | OG image signing (`nuxt-og-image`) |
 | `SEED_KEY` | Gate for `POST /api/seed` in non-dev |
 
 **Deployed:** set as **Cloudflare Wrangler secrets**:
@@ -364,9 +360,3 @@ Key packages:
 - `@paralleldrive/cuid2` - ID generation
 - `xlsx` - Excel/CSV export
 - `zod` - Schema validation
-
-### Pinned: `satori` must match `nuxt-og-image`'s peer range
-
-`nuxt-og-image@7` (via `@nuxtjs/seo@6`) declares `satori: ^0.47.1` as a peer and fails the build (`Satori X is not supported`) outside that range. Our direct `satori` devDependency is what gets hoisted, so keep it at `^0.47.1` — don't take `satori@latest`. When bumping `@nuxtjs/seo`, check `pnpm view nuxt-og-image@<version> peerDependencies` and move `satori` with it, then run `pnpm run build` to verify.
-
-The build also logs `@nuxt/fonts 0.14.0 is not supported. Version 1.0.0+ is required for OG image font extraction.` `@nuxt/fonts` 0.14 comes from `@nuxt/ui`, so it can't be bumped independently. It's non-fatal and irrelevant while the app generates no OG images; it goes away once `@nuxt/ui` moves to `@nuxt/fonts@1`.

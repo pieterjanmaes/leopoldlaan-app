@@ -159,7 +159,6 @@ export default defineNuxtConfig({
 		'@nuxt/ui',
 		'@nuxtjs/i18n',
 		'@nuxt/scripts',
-		'@nuxtjs/seo',
 		'@nuxt/eslint',
 		'@nuxt/image',
 		'@nuxtjs/turnstile',
@@ -180,17 +179,11 @@ export default defineNuxtConfig({
 		}
 	},
 
-	// The app lives behind a login, so there is nothing to generate OG images for.
-	ogImage: {
-		enabled: false
-	},
-
-	// Everything is behind a login, so there is nothing to index.
-	robots: {
-		disallow: ['/']
-	},
-
 	routeRules: {
+		// A private app: keep every response out of search engines (public/robots.txt disallows crawling too).
+		'/**': {
+			headers: { 'X-Robots-Tag': 'noindex, nofollow' }
+		},
 		'/api/**': {
 			security: {
 				rateLimiter: {
@@ -252,24 +245,6 @@ export default defineNuxtConfig({
 				'base-uri': ["'self'"]
 			}
 		}
-	},
-
-	/*
-	seo: {
-		redirectToCanonicalSiteUrl: true
-	},
-  */
-
-	site: {
-		url: process.env.NUXT_SITE_URL,
-		trailingSlash: false
-	},
-
-	// schema.org (part of @nuxtjs/seo) is disabled: the app emits no structured
-	// data and nuxt-schema-org@6.2.3 crashes under the unhead v3 shipped by Nuxt
-	// 4.5.0. Re-enable once nuxt-schema-org ships an unhead-v3 fix.
-	schemaOrg: {
-		enabled: false
 	},
 
 	turnstile: {
