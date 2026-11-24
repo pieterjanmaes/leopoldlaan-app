@@ -1,7 +1,7 @@
 ---
 seo:
-  title: WOTZ Nuxt Starter — Developer Docs
-  description: Documentation for the WOTZ Nuxt 4 starter template — multilingual, Cloudflare-deployed, with Studio, Drizzle, and a full admin dashboard.
+  title: Leopoldlaan — Developer Docs
+  description: Documentation for the Leopoldlaan renovation app — tasks, planning, floor plans, budget and Google Drive files for a household and its contractors.
 ---
 
 ::u-page-hero
@@ -9,10 +9,10 @@ seo:
 orientation: horizontal
 ---
 #title
-WOTZ Nuxt Starter
+Leopoldlaan
 
 #description
-A production-ready Nuxt 4 starter by Who Owns The Zebra. Multilingual content (i18n + Nuxt Content), Nuxt UI v4, Cloudflare Workers deployment via NuxtHub, Drizzle ORM with D1, auth + admin dashboard, and Nuxt Studio for visual content editing.
+A private app to run the renovation of our house: tasks on a board, a Gantt planning, a floor plan per floor, the budget with quotes and invoices, and the project files in Google Drive — shared with the household and, in a limited way, with contractors. Nuxt 4, Nuxt UI, Cloudflare Workers, D1 and Drizzle.
 
 #links
   :::u-button
@@ -27,72 +27,70 @@ A production-ready Nuxt 4 starter by Who Owns The Zebra. Multilingual content (i
   ---
   color: neutral
   size: lg
-  to: https://github.com/wotzebra/wotz-nuxt-starter
+  to: /roadmap/app-ideas
   variant: outline
-  target: _blank
   ---
-  GitHub
+  Roadmap & advice
   :::
 ::
 
 ::u-page-section
 ---
 title: What's inside
-description: Everything wired up so you can start shipping features the same day you clone.
 ---
   ::::u-page-grid
     :::u-page-card
     ---
-    icon: i-lucide-globe
-    title: Multilingual content
-    to: /i18n/overview
+    icon: i-lucide-list-checks
+    title: Tasks
+    to: /features/tasks
     ---
-    `@nuxtjs/i18n` with locale-prefixed routes, one Nuxt Content collection per locale, and `canonicalId`-based translation linking.
+    Kanban board and list, dependencies, comments, photos from the building site.
     :::
 
     :::u-page-card
     ---
-    icon: i-lucide-pen-tool
-    title: Visual editing with Studio
-    to: /content/nuxt-studio
+    icon: i-lucide-calendar-range
+    title: Planning
+    to: /features/planning
     ---
-    Edit markdown content in a browser UI. Floating button on every dev page; changes sync live to disk.
+    Gantt chart per phase with milestones and warnings when the order of work doesn't fit.
     :::
 
     :::u-page-card
     ---
-    icon: i-lucide-database
-    title: Drizzle + D1
-    to: /database/schema-and-orm
+    icon: i-lucide-map
+    title: Floor plan
+    to: /features/floor-plan
     ---
-    Type-safe schema, journaled migrations auto-applied on dev start, Drizzle Studio for local inspection.
+    A plan per floor with zones and pinned notes linked to rooms and tasks.
     :::
 
     :::u-page-card
     ---
-    icon: i-lucide-shield-check
-    title: Auth + admin dashboard
-    to: /auth-and-dashboard/sessions
+    icon: i-lucide-wallet
+    title: Budget
+    to: /features/budget
     ---
-    Session-based auth via `nuxt-auth-utils`, scrypt hashing, role guards, and a working `/dashboard` UI.
+    Budget lines, quotes, invoices and subsidies, with a forecast and contingency.
     :::
 
     :::u-page-card
     ---
-    icon: i-lucide-cloud
-    title: Cloudflare-deployed
-    to: /deployment/cloudflare-and-wrangler
+    icon: i-lucide-hard-drive
+    title: Google Drive
+    to: /google-drive/setup
     ---
-    NuxtHub + Wrangler. Three environments (preview / preprod / production) with GitHub Actions workflows ready.
+    One project folder in your own Drive; contractors need no Google account.
     :::
 
     :::u-page-card
     ---
-    icon: i-lucide-zap
-    title: Oxlint + Oxfmt
-    to: /development/linting-and-formatting
+    icon: i-lucide-users
+    title: Roles & invites
+    to: /users-and-roles/roles
     ---
-    Fast Rust-based lint and format, with ESLint kept only for Vue-specific stylistic rules.
+    Owner, housemate and external — enforced on the server, not just in the UI.
     :::
   ::::
 ::

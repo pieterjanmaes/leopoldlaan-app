@@ -1,26 +1,23 @@
 <template>
-	<UApp :locale="locales[locale as keyof typeof locales]">
-		<CHeader />
-
+	<UApp :locale="nl">
 		<UError
 			:error="error"
-			:redirect="localePath('/')" />
+			redirect="/"
+			:clear="{ label: 'Terug naar overzicht' }" />
 	</UApp>
 </template>
 
 <script setup lang="ts">
-	import * as locales from '@nuxt/ui/locale';
+	import { nl } from '@nuxt/ui/locale';
 
 	import type { NuxtError } from '#app';
-
-	const { locale } = useI18n();
-	const localePath = useLocalePath();
 
 	defineProps<{
 		error: NuxtError;
 	}>();
 
 	useHead({
+		htmlAttrs: { lang: 'nl-BE' },
 		bodyAttrs: {
 			class: 'min-h-full h-[1px]'
 		}

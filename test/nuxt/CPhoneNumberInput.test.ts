@@ -1,11 +1,11 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { afterEach, describe, expect, it } from 'vitest';
-import { defineComponent, nextTick } from 'vue';
+import { defineComponent } from 'vue';
 import type { Composer } from 'vue-i18n';
 
 import { CPhoneNumberInput } from '#components';
 
-const setLocale = (locale: 'nl' | 'fr') => (useNuxtApp().$i18n as Composer).setLocale(locale);
+const setLocale = (locale: 'nl') => (useNuxtApp().$i18n as Composer).setLocale(locale);
 
 describe('CPhoneNumberInput', () => {
 	afterEach(async () => {
@@ -65,9 +65,5 @@ describe('CPhoneNumberInput', () => {
 		await mountSuspended(Probe);
 
 		expect(germany()).toBe('Duitsland');
-
-		await setLocale('fr');
-		await nextTick();
-		expect(germany()).toBe('Allemagne');
 	});
 });

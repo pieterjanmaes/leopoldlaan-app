@@ -1,5 +1,5 @@
 <template>
-	<UApp :locale="uiLocale">
+	<UApp :locale="nl">
 		<NuxtLayout>
 			<NuxtPage />
 		</NuxtLayout>
@@ -7,12 +7,11 @@
 </template>
 
 <script setup lang="ts">
-	import { fr, nl } from '@nuxt/ui/locale';
-
-	const { locale } = useI18n();
-	const uiLocale = computed(() => (locale.value === 'fr' ? fr : nl));
+	import { nl } from '@nuxt/ui/locale';
 
 	useHead({
+		htmlAttrs: { lang: 'nl-BE' },
+		titleTemplate: (title) => (title ? `${title} · Leopoldlaan` : 'Leopoldlaan'),
 		bodyAttrs: {
 			class: 'min-h-full h-[1px]'
 		}

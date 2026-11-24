@@ -1,44 +1,50 @@
+import { existsSync } from 'node:fs';
+
 export default defineNuxtConfig({
 	app: {
 		rootAttrs: {
 			class: 'min-h-full h-[1px] relative'
 		},
 		head: {
-			charset: 'utf-8',
-			viewport: 'width=device-width, initial-scale=1.0',
-			meta: [{ property: 'og:type', content: 'website' }]
+			viewport: 'width=device-width, initial-scale=1.0, viewport-fit=cover',
+			// Installable as a phone app (PWA): manifest + icons, no service worker, so data is never served stale.
+			link: [
+				{ rel: 'manifest', href: '/manifest.webmanifest' },
+				{ rel: 'icon', type: 'image/svg+xml', href: '/icons/icon.svg' },
+				{ rel: 'icon', type: 'image/png', sizes: '32x32', href: '/icons/favicon-32.png' },
+				{ rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' }
+			],
+			meta: [
+				{ name: 'theme-color', content: '#ffffff', media: '(prefers-color-scheme: light)' },
+				{ name: 'theme-color', content: '#1c1917', media: '(prefers-color-scheme: dark)' },
+				{ name: 'mobile-web-app-capable', content: 'yes' },
+				{ name: 'apple-mobile-web-app-capable', content: 'yes' },
+				{ name: 'apple-mobile-web-app-title', content: 'Leopoldlaan' },
+				{ name: 'apple-mobile-web-app-status-bar-style', content: 'default' }
+			],
+			// Chrome fires beforeinstallprompt once, often before Nuxt has booted; park it for usePwaInstall().
+			script: [
+				{
+					innerHTML:
+						"window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__installPrompt=e;window.dispatchEvent(new Event('installpromptready'))});"
+				}
+			]
 		}
 	},
 
 	compatibilityDate: '2026-07-19',
 
-	content: {
-		database: {
-			type: 'd1',
-			bindingName: 'DB'
-		},
-		renderer: {
-			anchorLinks: {
-				h2: false,
-				h3: false,
-				h4: false
-			}
-		},
-		build: {
-			markdown: {
-				highlight: false
-			}
-		}
-	},
-
 	css: ['~/assets/css/main.css'],
 
-	devServer: {
-		https: {
-			key: './localhost-key.pem',
-			cert: './localhost.pem'
-		}
-	},
+	// HTTPS in dev only when the local certificates exist (they are gitignored).
+	devServer: existsSync('./localhost.pem')
+		? {
+				https: {
+					key: './localhost-key.pem',
+					cert: './localhost.pem'
+				}
+			}
+		: {},
 
 	devtools: { enabled: true },
 
@@ -75,20 +81,6 @@ export default defineNuxtConfig({
 	},
 
 	hooks: {
-		// @nuxt/content's mdc module injects `@nuxtjs/mdc > <dep>` entries into
-		// vite.optimizeDeps.include that Vite 8 can't resolve (two @nuxtjs/mdc
-		// versions in the tree), producing the NUXT_B7002 warning. They're
-		// unresolvable so Vite already skips pre-bundling them — stripping them is
-		// behaviour-neutral and just silences the warning. Remove once @nuxt/content
-		// ships a fix.
-		'vite:extendConfig'(viteConfig) {
-			if (viteConfig.optimizeDeps?.include) {
-				viteConfig.optimizeDeps.include = viteConfig.optimizeDeps.include.filter(
-					(dep) => !dep.startsWith('@nuxtjs/mdc >')
-				);
-			}
-		},
-
 		// Nuxt 4.5.0's own `check-if-page-unused` plugin is transpiled with an
 		// aliased default export (`export { plugin as default }`) that its own
 		// plugin scanner doesn't recognise, so it emits a false-positive NUXT_B2005
@@ -106,7 +98,6 @@ export default defineNuxtConfig({
 	},
 
 	i18n: {
-		baseUrl: process.env.SITE_URL,
 		defaultLocale: 'nl',
 		locales: [
 			{
@@ -114,15 +105,9 @@ export default defineNuxtConfig({
 				language: 'nl-BE',
 				name: 'Nederlands',
 				file: 'nl.json'
-			},
-			{
-				code: 'fr',
-				language: 'fr-BE',
-				name: 'Francais',
-				file: 'fr.json'
 			}
 		],
-		strategy: 'prefix',
+		strategy: 'no_prefix',
 		langDir: 'locales/',
 		vueI18n: './i18n.config.ts',
 		detectBrowserLanguage: false
@@ -132,7 +117,6 @@ export default defineNuxtConfig({
 		provider: 'iconify',
 		clientBundle: {
 			scan: true,
-			includeCustomCollections: true,
 			icons: [
 				'lucide:arrow-down',
 				'lucide:arrow-left',
@@ -168,21 +152,13 @@ export default defineNuxtConfig({
 				'lucide:sun',
 				'lucide:upload'
 			]
-		},
-		customCollections: [
-			{
-				prefix: 'logo',
-				dir: './app/assets/svg/logos',
-				normalizeIconName: true
-			}
-		]
+		}
 	},
 
 	modules: [
 		'@nuxt/ui',
 		'@nuxtjs/i18n',
 		'@nuxt/scripts',
-		'@nuxt/content',
 		'@nuxtjs/seo',
 		'@nuxt/eslint',
 		'@nuxt/image',
@@ -191,7 +167,6 @@ export default defineNuxtConfig({
 		'nuxt-auth-utils',
 		'@nuxthub/core',
 		'oxc-nuxt',
-		'nuxt-studio',
 		'nuxt-security'
 	],
 
@@ -199,24 +174,33 @@ export default defineNuxtConfig({
 		compressPublicAssets: true,
 		minify: true,
 		preset: process.env.NODE_ENV === 'development' ? undefined : 'cloudflare_module',
-		prerender: {
-			crawlLinks: false,
-			failOnError: false,
-			ignore: ['/']
-		},
 		cloudflare: {
 			deployConfig: false,
 			nodeCompat: true
 		}
 	},
 
+	// The app lives behind a login, so there is nothing to generate OG images for.
+	ogImage: {
+		enabled: false
+	},
+
+	// Everything is behind a login, so there is nothing to index.
 	robots: {
-		disallow: process.env.NUXT_SITE_ENV === 'production' ? [] : ['/'],
-		sitemap: '/sitemap_index.xml'
+		disallow: ['/']
 	},
 
 	routeRules: {
-		'/api/*': {
+		'/api/**': {
+			security: {
+				rateLimiter: {
+					tokensPerInterval: 240,
+					interval: 60_000
+				}
+			}
+		},
+		// Credential endpoints get a much tighter budget against brute forcing.
+		'/api/auth/**': {
 			security: {
 				rateLimiter: {
 					tokensPerInterval: 10,
@@ -227,6 +211,15 @@ export default defineNuxtConfig({
 	},
 
 	runtimeConfig: {
+		// Read by nuxt-auth-utils' Google handler (NUXT_OAUTH_GOOGLE_CLIENT_ID / _SECRET).
+		oauth: {
+			google: {
+				clientId: '',
+				clientSecret: ''
+			}
+		},
+		// Encrypts the stored Google Drive refresh token (NUXT_DRIVE_TOKEN_KEY, 32+ random chars).
+		driveTokenKey: '',
 		turnstile: {
 			secretKey: ''
 		},
@@ -234,19 +227,6 @@ export default defineNuxtConfig({
 			userbackToken: ''
 		}
 	},
-
-	/*
-	scripts: {
-		registry: {
-			googleTagManager: {
-				id: process.env.GOOGLE_TAG_MANAGER_ID,
-				scriptInput: {
-					fetchpriority: 'high'
-				}
-			}
-		}
-	},
-  */
 
 	security: {
 		rateLimiter: false,
@@ -260,34 +240,14 @@ export default defineNuxtConfig({
 			// commits every subdomain to HTTPS. Keep that a deliberate step.
 			strictTransportSecurity: { maxAge: 31536000, includeSubdomains: true, preload: true },
 			contentSecurityPolicy: {
-				'font-src': ["'self'", 'https:', '*.cloudflare.com', '*.cookiefirst.com'],
-				'img-src': [
-					"'self'",
-					'data:',
-					'https:',
-					'*.googletagmanager.com',
-					'*.google-analytics.com',
-					'*.cookiefirst.com'
-				],
-				'script-src': [
-					"'self'",
-					"'unsafe-inline'",
-					"'unsafe-eval'",
-					'*.googletagmanager.com',
-					'*.cloudflare.com',
-					'*.cookiefirst.com'
-				],
-				'style-src': ["'self'", "'unsafe-inline'", '*.cookiefirst.com'],
-				'connect-src': [
-					"'self'",
-					'https:',
-					'http:',
-					'*.googletagmanager.com',
-					'*.google-analytics.com',
-					'*.cookiefirst.com'
-				],
+				'font-src': ["'self'", 'https:'],
+				'img-src': ["'self'", 'data:', 'blob:', 'https:'],
+				'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", '*.cloudflare.com'],
+				'style-src': ["'self'", "'unsafe-inline'"],
+				'connect-src': ["'self'", 'https:'],
 				'media-src': ["'self'", 'https:'],
-				'frame-src': ["'self'", '*.googletagmanager.com', '*.cloudflare.com', '*.cookiefirst.com'],
+				// Drive previews are embedded from drive.google.com.
+				'frame-src': ["'self'", '*.cloudflare.com', 'https://drive.google.com'],
 				'object-src': ["'none'"],
 				'base-uri': ["'self'"]
 			}
@@ -312,20 +272,6 @@ export default defineNuxtConfig({
 		enabled: false
 	},
 
-	studio: {
-		i18n: {
-			defaultLocale: 'nl'
-		}
-		/*
-		repository: {
-			provider: 'github',
-			owner: 'wotzebra',
-			repo: 'wotz-nuxt-starter',
-			branch: 'preview'
-		}
-    */
-	},
-
 	turnstile: {
 		siteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY
 	},
@@ -335,7 +281,16 @@ export default defineNuxtConfig({
 			dedupe: ['vue']
 		},
 		optimizeDeps: {
-			include: ['@userback/widget', 'zod', 'zod/locales']
+			include: [
+				'@userback/widget',
+				'zod',
+				'zod/locales',
+				'sortablejs',
+				'xlsx',
+				'@internationalized/date',
+				'konva',
+				'vue-konva'
+			]
 		}
 	}
 

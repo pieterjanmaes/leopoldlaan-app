@@ -1,15 +1,27 @@
 <template>
-	<NuxtLinkLocale
+	<NuxtLink
 		to="/"
-		class="flex items-center"
-		aria-label="Who Owns The Zebra">
-		<Icon
-			name="logo:wotz-2lines"
-			class="md:hidden"
-			aria-hidden="true" />
-		<Icon
-			name="logo:wotz"
-			class="hidden md:block"
-			aria-hidden="true" />
-	</NuxtLinkLocale>
+		class="text-highlighted flex items-center gap-2 font-bold"
+		aria-label="Leopoldlaan – overzicht">
+		<span class="bg-primary text-inverted flex size-7 shrink-0 items-center justify-center rounded-md">
+			<UIcon
+				name="i-lucide-house-plus"
+				class="size-4" />
+		</span>
+		<span
+			v-if="!iconOnly"
+			class="truncate">
+			{{ name }}
+		</span>
+	</NuxtLink>
 </template>
+
+<script setup lang="ts">
+	withDefaults(
+		defineProps<{
+			iconOnly?: boolean;
+			name?: string;
+		}>(),
+		{ name: 'Leopoldlaan' }
+	);
+</script>

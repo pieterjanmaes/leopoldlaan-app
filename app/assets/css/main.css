@@ -1,23 +1,10 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
 
-@import './prose.css';
-
-@source '../../../content/**/*';
+/* Category colours are picked at runtime (bg-<color>-500), so Tailwind can't see them in the source. */
+@source inline('{bg,text,border}-{red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose,stone}-{100,500,600,700}');
+@source inline('dark:{bg,text}-{red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose,stone}-{400,900}');
 
 :root {
-	--color-violet-500: #802eaf;
-
 	--font-sans: 'Ubuntu';
-}
-
-.dark {
-}
-
-@layer base {
-}
-
-nuxt-studio {
-	position: relative;
-	z-index: 9999;
 }

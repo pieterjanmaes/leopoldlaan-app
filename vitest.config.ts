@@ -13,7 +13,8 @@ export default defineConfig({
 				resolve: {
 					alias: {
 						'@': fileURLToPath(new URL('./app', import.meta.url)),
-						'@@': fileURLToPath(new URL('.', import.meta.url))
+						'@@': fileURLToPath(new URL('.', import.meta.url)),
+						'hub:db': fileURLToPath(new URL('./test/unit/stubs/hub-db.ts', import.meta.url))
 					}
 				},
 				test: {
