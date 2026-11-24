@@ -314,15 +314,15 @@ Read by server endpoints at request time via `runtimeConfig`. Never put real val
 
 | Variable | Purpose |
 |---|---|
-| `NUXT_SESSION_PASSWORD` | Session-cookie encryption (32+ random chars) |
+| `NUXT_APP_SECRET` | Nuxt app secret; nuxt-auth-utils derives the session-cookie key from it (32+ random chars) |
 | `NUXT_TURNSTILE_SECRET_KEY` | Server-side Turnstile verification |
 | `NUXT_OG_IMAGE_SECRET` | OG image signing (`nuxt-og-image`) |
 | `SEED_KEY` | Gate for `POST /api/seed` in non-dev |
 
 **Deployed:** set as **Cloudflare Wrangler secrets**:
 ```bash
-wrangler secret put NUXT_SESSION_PASSWORD              # production
-wrangler secret put NUXT_SESSION_PASSWORD --env preview # preview
+wrangler secret put NUXT_APP_SECRET              # production
+wrangler secret put NUXT_APP_SECRET --env preview # preview
 ```
 
 Worker env at runtime overrides any build-time defaults baked from `runtimeConfig`. Mirroring them as GitHub repo secrets is optional (just provides a build-time fallback default; Cloudflare always wins at runtime).

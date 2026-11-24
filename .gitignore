@@ -31,3 +31,5 @@ localhost.pem
 .wrangler
 .dev.vars
 .claude
+
+.claude/worktrees/home-renovation-manager-d2de66/.data

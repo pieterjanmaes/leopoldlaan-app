@@ -45,7 +45,7 @@ jobs:
           NUXT_SITE_ENV: preprod
           NUXT_PRERENDER: 'true'
           NUXT_SITE_URL: ${{ vars.NUXT_SITE_URL }}
-          NUXT_SESSION_PASSWORD: ${{ secrets.NUXT_SESSION_PASSWORD }}
+          NUXT_APP_SECRET: ${{ secrets.NUXT_APP_SECRET }}
           NUXT_TURNSTILE_SECRET_KEY: ${{ secrets.NUXT_TURNSTILE_SECRET_KEY }}
           SEED_KEY: ${{ secrets.SEED_KEY }}
           GOOGLE_TAG_MANAGER_ID: ${{ vars.GOOGLE_TAG_MANAGER_ID }}

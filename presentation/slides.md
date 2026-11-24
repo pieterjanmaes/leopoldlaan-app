@@ -672,7 +672,7 @@ return { success: true };
 ```
 
 - **scrypt** hashing (memory-hard, GPU-resistant)
-- **Encrypted session cookie** (signed with `NUXT_SESSION_PASSWORD`)
+- **Encrypted session cookie** (signed with `NUXT_APP_SECRET`)
 - **`useUserSession()` composable** for client + server
 - **`requireUserSession()` server helper** — throws 401 if missing
 
@@ -814,7 +814,7 @@ The 10/min default came from defaults — we haven't seen it hit in normal use.
 **Examples:**
 
 - A: `NUXT_PUBLIC_TURNSTILE_SITE_KEY`, `NUXT_SITE_URL`
-- B: `NUXT_SESSION_PASSWORD`, `NUXT_TURNSTILE_SECRET_KEY`, `SEED_KEY`
+- B: `NUXT_APP_SECRET`, `NUXT_TURNSTILE_SECRET_KEY`, `SEED_KEY`
 - C: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
 
 The full annotated reference lives in `.env.example`. Cloudflare overrides at runtime always win.
@@ -837,8 +837,8 @@ npx wrangler d1 create wotz-nuxt-starter-preview
 # (copy database_ids into wrangler.jsonc)
 
 # Set runtime secrets per environment
-wrangler secret put NUXT_SESSION_PASSWORD
-wrangler secret put NUXT_SESSION_PASSWORD --env preview
+wrangler secret put NUXT_APP_SECRET
+wrangler secret put NUXT_APP_SECRET --env preview
 wrangler secret put NUXT_TURNSTILE_SECRET_KEY
 wrangler secret put NUXT_TURNSTILE_SECRET_KEY --env preview
 # ... repeat per secret

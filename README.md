@@ -34,7 +34,7 @@ Requires Node ≥ 24 and pnpm.
 
 ```bash
 pnpm install
-cp .env.example .env   # fill NUXT_SESSION_PASSWORD and NUXT_DRIVE_TOKEN_KEY (32+ random chars each)
+cp .env.example .env   # fill NUXT_APP_SECRET and NUXT_DRIVE_TOKEN_KEY (32+ random chars each)
 pnpm run dev           # https://localhost:3000 (HTTPS when localhost.pem / localhost-key.pem exist)
 ```
 
@@ -86,7 +86,7 @@ Same pipeline as the starter (`.github/workflows/deploy-*.yml`, see `CLAUDE.md`)
 ```bash
 wrangler d1 create leopoldlaan-app            # paste the id into wrangler.jsonc
 wrangler d1 create leopoldlaan-app-preview    # and this one under env.preview
-wrangler secret put NUXT_SESSION_PASSWORD
+wrangler secret put NUXT_APP_SECRET
 wrangler secret put NUXT_TURNSTILE_SECRET_KEY
 wrangler secret put NUXT_OAUTH_GOOGLE_CLIENT_ID
 wrangler secret put NUXT_OAUTH_GOOGLE_CLIENT_SECRET

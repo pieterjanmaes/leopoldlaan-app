@@ -38,7 +38,7 @@
 	// Run these commands to add secrets to production:
 	//
 	// wrangler secret put NUXT_TURNSTILE_SECRET_KEY
-	// wrangler secret put NUXT_SESSION_PASSWORD
+	// wrangler secret put NUXT_APP_SECRET
 	// wrangler secret put SEED_KEY
 	// wrangler secret put NUXT_OAUTH_GOOGLE_CLIENT_ID
 	// wrangler secret put NUXT_OAUTH_GOOGLE_CLIENT_SECRET
@@ -47,7 +47,7 @@
 	// For preview environment, add secrets with --env preview:
 	//
 	// wrangler secret put NUXT_TURNSTILE_SECRET_KEY --env preview
-	// wrangler secret put NUXT_SESSION_PASSWORD --env preview
+	// wrangler secret put NUXT_APP_SECRET --env preview
 	// wrangler secret put SEED_KEY --env preview
 	//
 	// Environment-specific configurations

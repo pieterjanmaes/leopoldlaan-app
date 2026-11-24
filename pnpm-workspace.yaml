@@ -17,6 +17,8 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - nuxt
   - '@nuxt/*'
+  - '@vueuse/shared@15.1.0'
+  - nitropack@2.14.0
 
 # pnpm 11 no longer reads `shamefully-hoist=true` from .npmrc; without this the
 # root node_modules holds only direct deps, so tsconfig's `"types": ["node"]`

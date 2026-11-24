@@ -39,12 +39,12 @@
   // Run these commands to add secrets to production:
   //
   // wrangler secret put NUXT_TURNSTILE_SECRET_KEY
-  // wrangler secret put NUXT_SESSION_PASSWORD
+  // wrangler secret put NUXT_APP_SECRET
   //
   //
   // For preview environment, add secrets with --env preview:
   // wrangler secret put NUXT_TURNSTILE_SECRET_KEY --env preview
-  // wrangler secret put NUXT_SESSION_PASSWORD
+  // wrangler secret put NUXT_APP_SECRET
   //
   // Environment-specific configurations
   "env": {
